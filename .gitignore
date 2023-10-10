@@ -1,0 +1,16 @@
+# Ignore all files
+*
+
+# Whitelist specific directories
+!.gitignore
+!get_article/
+!push_to_fifo/
+!push_to_queue/
+!put_final_translation/
+!put_first_translation/
+!translation_services/
+
+# Ignore zip files and env directories everywhere
+*.zip
+**/env/
+**/dependencies/
