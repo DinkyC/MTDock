@@ -14,7 +14,7 @@
 !put_first_translation/
 !put_first_translation/*
 !translation_services/
-!translation_services/*
+!translation_services/**/*
 
 # Ignore zip files and env directories everywhere
 *.zip
