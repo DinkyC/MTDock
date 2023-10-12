@@ -48,6 +48,9 @@ def lambda_handler(event, context):
     id = queryStringParameters.get("id")
     title = queryStringParameters.get("title")
 
+    to_lang = queryStringParameters.get("to_lang")
+    from_lang = queryStringParameters.get("from_lang")
+
     parameter_dict = aws.get_parameters_from_store()
 
     aws_sqs = parameter_dict.get("sqs_aws")
@@ -66,6 +69,11 @@ def lambda_handler(event, context):
             "statusCode": 500,
             "body": f"ERROR: Cannot call api.\n{str(e)}"
         }
+    
+    text = json.loads(text)
+    text["to_lang"] = to_lang
+    text["from_lang"] = from_lang
+
     try:
         with concurrent.futures.ThreadPoolExecutor() as executor:
             # Submit tasks using lambda functions

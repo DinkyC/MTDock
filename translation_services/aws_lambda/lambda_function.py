@@ -13,18 +13,18 @@ class TranslationHandler:
         self.translate_client = boto3.client('translate')
         self.MAX_BYTES = 10_000
 
-    def translate(self, text):
+    def translate(self, text, from_lang, to_lang):
         try:
             translated_response = self.translate_client.translate_text(
                 Text=text,
-                SourceLanguageCode='en',
-                TargetLanguageCode='es'
+                SourceLanguageCode=from_lang,
+                TargetLanguageCode=to_lang
             )
             return translated_response['TranslatedText']
         
         except Exception as e:
             if "TextSizeLimitExceededException" in str(e):
-                 translated_response = self.handle_long_text_translation(text)
+                 translated_response = self.handle_long_text_translation(text, from_lang, to_lang)
                  return translated_response
             else:
                 return {"Error" : f"Error translating text {e}"}
@@ -51,7 +51,7 @@ class TranslationHandler:
         return chunks
 
 
-    def handle_long_text_translation(self, text):
+    def handle_long_text_translation(self, text, from_lang, to_lang):
         # Split the text into chunks
         parts = self.split_text_into_chunks(text, self.MAX_BYTES - 500) 
         
@@ -61,8 +61,8 @@ class TranslationHandler:
             try:
                 translated_response = self.translate_client.translate_text(
                     Text=part,
-                    SourceLanguageCode='en',
-                    TargetLanguageCode='es'
+                    SourceLanguageCode=from_lang,
+                    TargetLanguageCode=to_lang
                     ) 
                 translated_parts.append(translated_response['TranslatedText'])
             except Exception as e:
@@ -113,12 +113,13 @@ def lambda_handler(event, context):
     for message in event.get('Records'):
         message_body = message.get('body')
         parsed_message = json.loads(message_body)
-        
-        serialized = json.loads(parsed_message)
+
+        to_lang = parsed_message.get('to_lang')
+        from_lang = parsed_message.get('from_lang')
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            future_title = executor.submit(translator.translate, serialized.get('title'))
-            future_text = executor.submit(translator.translate, serialized.get('BodyText'))
+            future_title = executor.submit(translator.translate, parsed_message.get('title'), from_lang, to_lang)
+            future_text = executor.submit(translator.translate, parsed_message.get('BodyText'), from_lang, to_lang)
 
             # Capture translated results
             translated_title = future_title.result()
@@ -127,7 +128,7 @@ def lambda_handler(event, context):
         translated_data = {
             "title": translated_title,
             "text": translated_text,
-            "id": serialized.get('id'),
+            "id": parsed_message.get('id'),
         }
 
         checksum = aws.compute_checksum(translated_data)
@@ -140,7 +141,7 @@ def lambda_handler(event, context):
 
     return {
         "status": "success",
-        "message_count": len(messages)
+        "message_count": len(event.get('Records')) 
     }
 #
 # if __name__ == "__main__":
