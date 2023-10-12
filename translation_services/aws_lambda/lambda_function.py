@@ -122,7 +122,6 @@ def lambda_handler(event, context):
 
     params_dict = aws.get_parameters_from_store()
 
-    # Assuming get_fifo_sqs returns a dictionary with a 'Messages' key
     messages = aws.get_fifo_sqs(params_dict.get("sqs_aws"))
 
     for message in messages:
