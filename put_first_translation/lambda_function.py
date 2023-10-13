@@ -1,13 +1,10 @@
 import pymysql
 import logging
 import traceback
-from os import environ
+import os 
 import hashlib
 import boto3
 import json
-
-port = environ.get('PORT')
-database = environ.get('DATABASE')
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -16,12 +13,12 @@ class HTDatabase:
     def get_database_credentials(self):
         secret = self.get_secret()
         secret_dict = json.loads(secret)
-        return secret_dict.get('username'), secret_dict.get('password'), secret_dict.get('host')
+        return secret_dict.get('username'), secret_dict.get('port'), secret_dict.get('database'), secret_dict.get('host')
 
 
     def get_secret(self):
         secret_name = "HighTimesDB"
-        region_name = "us-west-1"
+        region_name = os.environ['AWS_REGION'] 
         session = boto3.session.Session()
         client = session.client(service_name='secretsmanager', region_name=region_name)
         try:
@@ -31,14 +28,25 @@ class HTDatabase:
             raise e
 
     def make_connection(self):
-        dbuser, password, endpoint = self.get_database_credentials()
+        rds_client = boto3.client('rds')
+
+        username, port, database, endpoint = self.get_database_credentials()
+
+        database_token = rds_client.generate_db_auth_token(
+            DBHostname=endpoint,
+            Port=port,
+            DBUsername=username,
+            Region=os.environ['AWS_REGION']
+            )
+
         return pymysql.connect(
             host=endpoint,
-            user=dbuser,
-            passwd=password,
+            user=username,
+            passwd=database_token,
             port=int(port),
-            db=database,  # Specify the database name here
-            autocommit=True
+            db=database,  
+            autocommit=True,
+            ssl={'ssl': True}
         )
 
 

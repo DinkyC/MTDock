@@ -17,7 +17,7 @@ class HTDatabase:
 
     def get_secret(self):
         secret_name = "HighTimesDB"
-        region_name = "us-west-1"
+        region_name = os.environ['AWS_REGION'] 
         session = boto3.session.Session()
         client = session.client(service_name='secretsmanager', region_name=region_name)
         try:
@@ -58,17 +58,19 @@ class HTDatabase:
 
 
 def handler(event, context):
+    body = event.get('body', '{}')
+    data = json.loads(body)
     db = HTDatabase()
 
     try:
         # Extract the data you want to insert from the event or any other source
-        translated_data = {"title": event.get("title"), "text": event.get("text"), "id": event.get("id")}
+        translated_data = {"title": data.get("title"), "text": data.get("text"), "id": data.get("id")}
         
         checksum = db.compute_checksum(translated_data)
         cnx = db.make_connection()
         cursor = cnx.cursor()
         
-        if checksum.hex() != event.get('checksum'):
+        if checksum.hex() != data.get('checksum'):
             return {
                     "statusCode": 500,
                     "body": "Data corruption",
@@ -82,7 +84,7 @@ def handler(event, context):
                 SELECT COUNT(*) FROM HighTimes.final_translation
                 WHERE id = %s AND checksum = %s
             """
-            cursor.execute(select_statement, (event.get('id'), checksum))
+            cursor.execute(select_statement, (data.get('id'), checksum))
             result = cursor.fetchone()
 
             # If a row with the same id and checksum is found, it means the article already exists
@@ -101,7 +103,7 @@ def handler(event, context):
             """
             try:
                 # Execute the INSERT statement with the data
-                cursor.execute(insert_statement, (event.get("id"), event.get("title"), event.get("text"), event.get("comments", None), event.get('rating'), checksum))
+                cursor.execute(insert_statement, (data.get("id"), data.get("title"), data.get("text"), data.get("comments", None), data.get('rating'), checksum))
             except Exception as e:
                 return {
                     "statusCode": 500,
@@ -124,10 +126,41 @@ def handler(event, context):
             pass
 if __name__ == "__main__":
     event = {
-  "title": "value1",
-  "text": "value2",
-  "id": 57,
-  "checksum":"c0c4208611a66297644373675e64c20e81d43b1760ab40a42605b6bd7908912c",
-  "rating": 4
-}
+      "resource": "/your/resource/path",
+      "path": "/your/resource/path",
+      "httpMethod": "POST",
+      "headers": {
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Host": "your-api-id.execute-api.your-region.amazonaws.com",
+        "User-Agent": "curl/7.53.1"
+      },
+      "multiValueHeaders": {
+        "Accept": ["*/*"],
+        "Content-Type": ["application/json"]
+      },
+      "queryStringParameters": {
+        "param1": "value1",
+        "param2": "value2"
+      },
+      "multiValueQueryStringParameters": {
+        "param1": ["value1"],
+        "param2": ["value2", "value2B"]
+      },
+      "pathParameters": {
+        "pathParam1": "value1"
+      },
+      "stageVariables": {
+        "stageVarName": "stageVarValue"
+      },
+      "requestContext": {
+        "requestId": "request-id",
+        "path": "/your/resource/path",
+        "httpMethod": "POST",
+        "stage": "prod"
+      },
+      "body": "{\"title\": \"value1\", \"text\": \"value2\", \"id\": 57, \"checksum\": \"c0c4208611a66297644373675e64c20e81d43b1760ab40a42605b6bd7908912c\", \"rating\": 4}",
+      "isBase64Encoded": "false"
+    }
+
     handler(event, None) 
