@@ -13,6 +13,10 @@
 !put_final_translation/*
 !put_first_translation/
 !put_first_translation/*
+!get_first_translation/
+!get_first_translation/*
+!get_final_translation/
+!get_final_translation/*
 !translation_services/
 !translation_services/**/*
 
