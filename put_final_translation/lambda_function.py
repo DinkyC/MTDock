@@ -44,7 +44,8 @@ class HTDatabase:
             passwd=database_token,
             port=int(port),
             db=database,  
-            autocommit=True
+            autocommit=True,
+            ssl={'ssl': True}
         )
 
 
