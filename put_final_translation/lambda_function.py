@@ -124,43 +124,43 @@ def handler(event, context):
             cnx.close()
         except:
             pass
-if __name__ == "__main__":
-    event = {
-      "resource": "/your/resource/path",
-      "path": "/your/resource/path",
-      "httpMethod": "POST",
-      "headers": {
-        "Accept": "*/*",
-        "Content-Type": "application/json",
-        "Host": "your-api-id.execute-api.your-region.amazonaws.com",
-        "User-Agent": "curl/7.53.1"
-      },
-      "multiValueHeaders": {
-        "Accept": ["*/*"],
-        "Content-Type": ["application/json"]
-      },
-      "queryStringParameters": {
-        "param1": "value1",
-        "param2": "value2"
-      },
-      "multiValueQueryStringParameters": {
-        "param1": ["value1"],
-        "param2": ["value2", "value2B"]
-      },
-      "pathParameters": {
-        "pathParam1": "value1"
-      },
-      "stageVariables": {
-        "stageVarName": "stageVarValue"
-      },
-      "requestContext": {
-        "requestId": "request-id",
-        "path": "/your/resource/path",
-        "httpMethod": "POST",
-        "stage": "prod"
-      },
-      "body": "{\"title\": \"value1\", \"text\": \"value2\", \"id\": 57, \"checksum\": \"c0c4208611a66297644373675e64c20e81d43b1760ab40a42605b6bd7908912c\", \"rating\": 4}",
-      "isBase64Encoded": "false"
-    }
-
-    handler(event, None) 
+# if __name__ == "__main__":
+#     event = {
+#       "resource": "/your/resource/path",
+#       "path": "/your/resource/path",
+#       "httpMethod": "POST",
+#       "headers": {
+#         "Accept": "*/*",
+#         "Content-Type": "application/json",
+#         "Host": "your-api-id.execute-api.your-region.amazonaws.com",
+#         "User-Agent": "curl/7.53.1"
+#       },
+#       "multiValueHeaders": {
+#         "Accept": ["*/*"],
+#         "Content-Type": ["application/json"]
+#       },
+#       "queryStringParameters": {
+#         "param1": "value1",
+#         "param2": "value2"
+#       },
+#       "multiValueQueryStringParameters": {
+#         "param1": ["value1"],
+#         "param2": ["value2", "value2B"]
+#       },
+#       "pathParameters": {
+#         "pathParam1": "value1"
+#       },
+#       "stageVariables": {
+#         "stageVarName": "stageVarValue"
+#       },
+#       "requestContext": {
+#         "requestId": "request-id",
+#         "path": "/your/resource/path",
+#         "httpMethod": "POST",
+#         "stage": "prod"
+#       },
+#       "body": "{\"title\": \"value1\", \"text\": \"value2\", \"id\": 57, \"checksum\": \"c0c4208611a66297644373675e64c20e81d43b1760ab40a42605b6bd7908912c\", \"rating\": 4}",
+#       "isBase64Encoded": "false"
+#     }
+#
+#     handler(event, None) 
