@@ -58,7 +58,7 @@ class GCPTranslation:
                 response = client.translate_text(
                     request={
                         "parent": parent,
-                        "contents": [text],
+                        "contents": [part],
                         "mime_type": "text/plain",
                         "source_language_code": from_language,  # Set the source language
                         "target_language_code": to_language,    # Set the target language
@@ -128,7 +128,7 @@ def lambda_handler(event, context):
         to_lang = parsed_message.get('to_lang')
 
         translated_title = translator.translate(parsed_message.get('title'), from_lang, to_lang, params_dict.get('project_id'))
-        translated_text = translator.translate(parsed_message.get('title'), from_lang, to_lang, params_dict.get('project_id'))
+        translated_text = translator.translate(parsed_message.get('BodyText'), from_lang, to_lang, params_dict.get('project_id'))
 
         translated_data = {
             "title": translated_title,

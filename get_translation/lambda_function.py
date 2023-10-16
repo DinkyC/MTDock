@@ -4,7 +4,7 @@ import traceback
 import os 
 import json
 import boto3
-
+import pdb
 logger=logging.getLogger()
 logger.setLevel(logging.INFO)
 
@@ -12,7 +12,7 @@ class HTDatabase:
     def construct_query(self, title_column, text_column, table, checksum_column, **kwargs):
         VALID_TABLES = ['final_translation', 'first_translation']
         VALID_COLUMNS = ['gcp_text', 'gcp_title', 'azure_text', 'azure_title', 'aws_title', 'aws_text',
-                         'gcp_checksum', 'aws_checksum', 'azure_checksum']
+                         'gcp_checksum', 'aws_checksum', 'azure_checksum', 'title', 'BodyText', 'checksum']
         
         # Sanitize table and column names
         if table not in VALID_TABLES:
@@ -28,10 +28,10 @@ class HTDatabase:
         conditions = []
         params = []
         
-        if 'title' in kwargs:
+        if kwargs.get('title'):
             conditions.append(f"{title_column} = %s")
             params.append(kwargs['title'])
-        if 'id' in kwargs:
+        if kwargs.get('id'):
             conditions.append("id = %s")
             params.append(kwargs['id'])
 
@@ -108,8 +108,10 @@ def handler(event,context):
         logger.info("No title provided.")
 
     try:
-      #  query, params = db.construct_query(title_column=title_column, text_column=text_column, table=table, checksum_column=checksum_column, title=title, id=id)
-        query, params = db.construct_query(title_column, text_column, table, checksum_column, title=title, id=id)
+        if table == 'first_translation':
+            query, params = db.construct_query(title_column, text_column, table, checksum_column, title=title, id=id)
+        else:
+            query, params = db.construct_query('title', 'BodyText', table, 'checksum', title=title, id=id)
     except Exception as e:
         logger.error(f"[ERROR]: Cannot construct query. {e}")
         return {
@@ -141,7 +143,8 @@ def handler(event,context):
             entry = {
                 "id": result[0][0],
                 "title": result[0][1],
-                "BodyText": result[0][2]
+                "text": result[0][2],
+                "checksum": result[0][3]
             }
         else:
             entry = {}
@@ -165,4 +168,41 @@ def handler(event,context):
         except: 
             pass 
 
-
+if __name__ == "__main__":
+    event = {
+  "resource": "/your/resource/path",
+  "path": "/your/resource/path",
+  "httpMethod": "POST",
+  "headers": {
+    "Accept": "*/*",
+    "Content-Type": "application/json",
+    "Host": "your-api-id.execute-api.your-region.amazonaws.com",
+    "User-Agent": "curl/7.53.1"
+  },
+  "multiValueHeaders": {
+    "Accept": ["*/*"],
+    "Content-Type": ["application/json"]
+  },
+  "queryStringParameters": {
+    "id": 100,
+    "table": "final_translation"
+  },
+  "multiValueQueryStringParameters": {
+    "param1": ["value1"],
+    "param2": ["value2", "value2B"]
+  },
+  "pathParameters": {
+    "pathParam1": "value1"
+  },
+  "stageVariables": {
+    "stageVarName": "stageVarValue"
+  },
+  "requestContext": {
+    "requestId": "request-id",
+    "path": "/your/resource/path",
+    "httpMethod": "POST",
+    "stage": "prod"
+  },
+  "isBase64Encoded": False 
+}
+    handler(event, None)
