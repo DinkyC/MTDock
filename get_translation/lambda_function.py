@@ -137,6 +137,8 @@ def handler(event,context):
         except:
             return db.log_err("[ERROR]: Cannot retrieve query data.\n{}".format(
                 traceback.format_exc()))
+
+        checksum = result[0][3].hex()
         # If there's a result, process it
         if result:
             # Convert the tuple to a dictionary
@@ -144,7 +146,7 @@ def handler(event,context):
                 "id": result[0][0],
                 "title": result[0][1],
                 "text": result[0][2],
-                "checksum": result[0][3]
+                "checksum": checksum
             }
         else:
             entry = {}
@@ -168,41 +170,3 @@ def handler(event,context):
         except: 
             pass 
 
-if __name__ == "__main__":
-    event = {
-  "resource": "/your/resource/path",
-  "path": "/your/resource/path",
-  "httpMethod": "POST",
-  "headers": {
-    "Accept": "*/*",
-    "Content-Type": "application/json",
-    "Host": "your-api-id.execute-api.your-region.amazonaws.com",
-    "User-Agent": "curl/7.53.1"
-  },
-  "multiValueHeaders": {
-    "Accept": ["*/*"],
-    "Content-Type": ["application/json"]
-  },
-  "queryStringParameters": {
-    "id": 100,
-    "table": "final_translation"
-  },
-  "multiValueQueryStringParameters": {
-    "param1": ["value1"],
-    "param2": ["value2", "value2B"]
-  },
-  "pathParameters": {
-    "pathParam1": "value1"
-  },
-  "stageVariables": {
-    "stageVarName": "stageVarValue"
-  },
-  "requestContext": {
-    "requestId": "request-id",
-    "path": "/your/resource/path",
-    "httpMethod": "POST",
-    "stage": "prod"
-  },
-  "isBase64Encoded": False 
-}
-    handler(event, None)

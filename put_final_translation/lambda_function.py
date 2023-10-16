@@ -56,7 +56,6 @@ class HTDatabase:
     def compute_checksum(self, data):
         return hashlib.sha256(str(data).encode('utf-8')).digest()
 
-
 def handler(event, context):
     body = event.get('body', '{}')
     data = json.loads(body)
