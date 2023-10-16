@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HT Translator</title>
+	<!-- Enlace a Bootstrap CSS -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+	<!-- HT Custom Styles -->
+	<link href="css/htstyle.css" rel="stylesheet">
+	<!-- Enlace a Font Awesome CSS -->
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+	<!-- Enlace a Google Fonts - Open Sans -->
+	<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<!-- Barra lateral -->
+			<nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+				<div class="sidebar-logo">
+					<img src="img/logo-ht-b.svg" alt="Logo Hightimes">
+				</div>
+				<div class="sidebar-separator"></div>
+				<ul class="nav flex-column">
+					<li class="nav-item">
+						<a class="nav-link" href="#" style="color: #1B2559;">
+							<i class="fas fa-bolt mr-2"></i> <!-- Icono del lado izquierdo -->
+							<span class="small-title">Translator</span>
+						</a>
+					</li>
+				</ul>
+				<div class="logout-button mt-auto"> <!-- mt-auto agrega margen superior automático para colocar el botón en la parte inferior -->
+					<button class="btn" style="background-color: #FFFFFF; border-radius: 30px;padding:15px 25px;box-shadow: 0px 15px 20px 5px rgba(112, 144, 176, 0.25); margin-top:165vh; width:200px;">
+						Log Out
+						<i class="fas fa-sign-out-alt ml-2"></i> 
+					</button>
+				</div>
+				<!-- Contenido de la barra lateral (opciones de menú) -->
+			</nav>
+
+			<!-- Contenido principal -->
+			<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+				<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+					<h1 class="h2">HT Translator</h1>
+				</div>
+				<div class="row justify-content-end">
+					<div class="col-auto">
+						<button class="custom-button">Next Article</button>
+					</div>
+				</div>
+				<div class="row mt-4">
+					<div class="col">
+						<h2 class="section-title">Original Article</h2>
+						<input type="text" class="form-control custom-textarea">
+					</div>
+				</div>
+				<div class="row mt-4">
+					<div class="col text-end">
+						<button class="btn" style="border-radius: 30px; background-color: #FFFFFF; border: 1px solid #E2E8F0; color: #1B2559;padding:15px 25px;">
+							<i class="fas fa-sync-alt mr-2"></i>
+							Regenerate Translation
+						</button>
+					</div>
+				</div>
+				<div class="row mt-4">
+					<div class="col">
+						<h2 class="section-title">Base translation</h2>
+						<input type="text" class="form-control custom-textarea">
+					</div>
+				</div>
+				<div class="row mt-4">
+					<div class="col-md-4">
+						<h2 class="section-title">AWS</h2>
+						<input type="text" class="form-control custom-textarea">
+					</div>
+					<div class="col-md-4 d-none d-md-block"> <!-- Ocultar en pantallas pequeñas -->
+						<h2 class="section-title">Google Cloud</h2>
+						<input type="text" class="form-control custom-textarea">
+					</div>
+					<div class="col-md-4 d-none d-md-block"> <!-- Ocultar en pantallas pequeñas -->
+						<h2 class="section-title">Microsoft Azure</h2>
+						<input type="text" class="form-control custom-textarea">
+					</div>
+				</div>
+				<div class="row mt-4 d-md-none"> <!-- Mostrar solo en pantallas pequeñas -->
+					<div class="col-md-4">
+						<h2 class="section-title">Google Cloud</h2>
+						<input type="text" class="form-control custom-textarea">
+					</div>
+					<div class="col-md-4">
+						<h2 class="section-title">Microsoft Azure</h2>
+						<input type="text" class="form-control custom-textarea">
+					</div>
+				</div>
+				<div class="row mt-4">
+					<div class="col text-end">
+						<button class="custom-button">Save new version</button>
+					</div>
+				</div>
+			</main>
+		</div>
+	</div>
+	<div class="footer">
+		<!-- Footer content -->
+		© 2023 High Times Español
+	</div>
+	<!-- Enlace a Bootstrap JS -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

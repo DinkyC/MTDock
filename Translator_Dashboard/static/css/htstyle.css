@@ -1,0 +1,136 @@
+/* HT STYLES */
+
+body, html {
+	font-family: 'Open Sans', sans-serif; /* Usando Open Sans como tipografía */
+	height: 100% !important;
+	margin:0;
+}
+.split-screen {
+	display: flex;
+	height: 100% !important;
+}
+
+.left-side {
+	background-color: #FFFFFF;
+	flex: 1;
+	padding: 50px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+.right-side {
+	background-color: #000000;
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.login-form {
+	max-width: 400px;
+	width: 100%;
+}
+.login-title {
+	font-size: 28px;
+	font-weight: bold;
+}
+.login-subtitle {
+	margin-top: 10px;
+	margin-bottom: 30px; /* Margen abajo de 30px */
+	font-size: 18px;
+	color: #6C757D;
+}
+.form-group {
+	margin-top: 20px;
+}
+.remember-me {
+	margin-top: 10px;
+}
+.sign-in-button {
+	margin-top: 30px; /* Margen arriba de 30px */
+}
+/* Estilo para los campos de email y password */
+.form-control {
+	padding: 15px;
+	margin-bottom: 30px; /* Margen abajo de 30px */
+	color: #A3AED0; /* Color de texto */
+}
+/* Estilo para el botón "Sign In" */
+.btn-primary {
+	background-color: #EB2028; /* Color rojo */
+	width: 100%; /* Ancho completo */
+	padding: 15px; /* Padding de 15px */
+	border-radius: 30px; /* Borde redondeado */
+	border: none;
+}
+@media (max-width: 767px) {
+	.split-screen {
+		flex-direction: column-reverse;
+	}
+	.left-side, .right-side {
+		flex: 1;
+	}
+}
+
+/* DASHBOARD STYLES */
+
+.custom-button {
+	border-radius: 30px;
+	background-color: #4318FF;
+	color: white;
+	box-shadow: 0px 10px 30px 0px rgba(96, 60, 255, 0.65);
+	padding: 15px 25px; /* Nuevos valores de padding */
+	border:none;
+}
+.colored-text {
+	color: #1B2559;
+}
+.sidebar {
+	background-color: #ffffff !important; /* Color de fondo de la barra lateral */
+	border-radius: 20px; /* Borde redondeado de la barra lateral */
+	box-shadow: 0px 17px 40px 4px rgba(112, 144, 176, 0.11); /* Sombra */
+}
+.sidebar-logo {
+	text-align: center;
+	padding: 20px 0;
+}
+.sidebar-logo img {
+	max-width: 150px;
+}
+.sidebar-separator {
+	border-top: 1px solid #ccc;
+	margin: 10px 0;
+}
+.custom-textarea {
+	height: 400px;
+	color: #A3AED0; /* Color de texto para las cajas de texto */
+	box-shadow: 14px 27px 45px 4px rgba(112, 144, 176, 0.2); /* Sombra */
+	position: relative;
+}
+.custom-textarea h2 {
+	color: #1B2559;
+	font-size: 18px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	margin: 10px 10px;
+}
+.logout-button {
+	margin-bottom: auto;
+	padding: 10px 0;
+	text-align: center;
+}
+.section-title {
+	font-size: 18px;
+	color: #1B2559;
+	margin-bottom: 10px;
+}
+.small-title {
+	font-size: 14px;
+}
+.footer {
+	color: #718096;
+	text-align: center;
+	padding: 25px 0;
+	font-size: 12px;
+}

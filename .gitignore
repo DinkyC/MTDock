@@ -16,7 +16,7 @@
 !get_translation/
 !get_translation/*
 !Translator_Dashboard/
-!Translator_Dashboard/*
+!Translator_Dashboard/**/**/*
 !translation_services/
 !translation_services/**/*
 
