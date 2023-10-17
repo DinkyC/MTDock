@@ -152,10 +152,11 @@ def handler(event,context):
             entry = {}
         return {
             "body": json.dumps(entry),  # Serialize list to JSON
-            "headers": {
-                "Content-Type": "application/json"  # Set appropriate response header
-            },
             "statusCode": 200,
+            "headers" : {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET,OPTIONS',
+                },
             "isBase64Encoded": "false"
         }
 

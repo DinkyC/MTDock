@@ -19,7 +19,7 @@
 			<!-- Barra lateral -->
 			<nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
 				<div class="sidebar-logo">
-					<img src="img/logo-ht-b.svg" alt="Logo Hightimes">
+					<img src="../static/img/logo-ht-b.svg" alt="Logo Hightimes">
 				</div>
 				<div class="sidebar-separator"></div>
 				<ul class="nav flex-column">
@@ -31,10 +31,11 @@
 					</li>
 				</ul>
 				<div class="logout-button mt-auto"> <!-- mt-auto agrega margen superior automático para colocar el botón en la parte inferior -->
-					<button class="btn" style="background-color: #FFFFFF; border-radius: 30px;padding:15px 25px;box-shadow: 0px 15px 20px 5px rgba(112, 144, 176, 0.25); margin-top:165vh; width:200px;">
-						Log Out
-						<i class="fas fa-sign-out-alt ml-2"></i> 
-					</button>
+                    <!--		<button class="btn" style="background-color: #FFFFFF; border-radius: 30px;padding:15px 25px;box-shadow: 0px 15px 20px 5px rgba(112, 144, 176, 0.25); margin-top:165vh; width:200px;"> -->
+						<a href="{{ url_for('logout') }}" class="btn" style="background-color: #FFFFFF; border-radius: 30px; padding: 15px 25px; box-shadow: 0px 15px 20px 5px rgba(112, 144, 176, 0.25); margin-top:165vh; width:200px;">
+                            Log Out <i class="fas fa-sign-out-alt ml-2"></i>
+                        </a>
+                        <!-- </button> -->
 				</div>
 				<!-- Contenido de la barra lateral (opciones de menú) -->
 			</nav>
