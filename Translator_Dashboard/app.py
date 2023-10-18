@@ -19,7 +19,7 @@ class AWSClient:
     def get_database_credentials(self):
         secret = self.get_secret()
         secret_dict = json.loads(secret)
-        return secret_dict.get('username'), secret_dict.get('port'), secret_dict.get('database'), secret_dict.get('host')
+        return secret_dict.get('username'), secret_dict.get('port'), secret_dict.get('database'), secret_dict.get('database_endpoint'), secret_dict.get('password')
 
 
     def get_secret(self):
@@ -33,29 +33,29 @@ class AWSClient:
         except Exception as e:
             raise e
 
-    def make_token(self):
-        rds_client = boto3.client('rds')
-
-        username, port, database, endpoint = self.get_database_credentials()
-
-        database_token = rds_client.generate_db_auth_token(
-            DBHostname=endpoint,
-            Port=port,
-            DBUsername=username,
-            Region=os.environ['AWS_REGION']
-            )
-
-        return database_token 
-
+    # def make_token(self):
+    #     rds_client = boto3.client('rds')
+    #
+    #     username, port, database, endpoint = self.get_database_credentials()
+    #
+    #     database_token = rds_client.generate_db_auth_token(
+    #         DBHostname=endpoint,
+    #         Port=port,
+    #         DBUsername=username,
+    #         Region=os.environ['AWS_REGION']
+    #         )
+    #
+    #     return database_token 
+    #
 def create_app():
     aws = AWSClient()
 
-    username, port, database, host = aws.get_database_credentials()
+    username, port, database, host, password = aws.get_database_credentials()
 
-    token = aws.make_token()
+   # token = aws.make_token()
 
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{username}:{token}@{host}/{database}?ssl=1&ssl_ca=/home/ubuntu/Translator_Dashboard/certs/AmazonRootCA1.pem"
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{username}:{password}@{host}/{database}" #?ssl=1&ssl_ca=/home/daniel/dev/translate/TranslationPortalAWS/Translator_Dashboard/certs/AmazonRootCA1.pem"
     app.config['SECRET_KEY'] = 'thisisasecretkey'
     app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=14)
 
