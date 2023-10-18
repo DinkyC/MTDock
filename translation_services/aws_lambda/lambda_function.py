@@ -95,7 +95,7 @@ class AWSClient:
         try:
             response = requests.post(endpoint, json=translate_text, headers=self.headers, params=self.params)
             if response.status_code == 200:
-                return response
+                return response.status_code
         except Exception as e:
             return {"[ERROR]" : f"Error processing messages {e}"}
 
@@ -119,7 +119,7 @@ def lambda_handler(event, context):
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future_title = executor.submit(translator.translate, parsed_message.get('title'), from_lang, to_lang)
-            future_text = executor.submit(translator.translate, parsed_message.get('BodyText'), from_lang, to_lang)
+            future_text = executor.submit(translator.translate, parsed_message.get('text'), from_lang, to_lang)
 
             # Capture translated results
             translated_title = future_title.result()
@@ -136,6 +136,8 @@ def lambda_handler(event, context):
         # Sending translated data to RDS
         try:
             send_to_rds_response = aws.insert_translation(params_dict["put_first"], translated_data)
+            if send_to_rds_response != 200:
+                raise e
         except Exception as e:
             return {"status": f"Failure {e}"}
 

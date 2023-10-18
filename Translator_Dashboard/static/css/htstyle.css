@@ -102,11 +102,64 @@ body, html {
 	margin: 10px 0;
 }
 .custom-textarea {
-	height: 400px;
-	color: #A3AED0; /* Color de texto para las cajas de texto */
-	box-shadow: 14px 27px 45px 4px rgba(112, 144, 176, 0.2); /* Sombra */
-	position: relative;
+    height: 400px;
+    color: #A3AED0;
+    box-shadow: 14px 27px 45px 4px rgba(112, 144, 176, 0.2);
+    overflow-y: scroll;
+    resize: none;
+    width: 100%;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
+
+#rating { font-size: 0; }
+#rating span { font-size: 40px; }
+#rating span::before { content: "☆"; }
+#rating span.active::before {content: "★"; }
+#rating span:hover { cursor: pointer; }
+
+.round-button {
+  width: 7% !important; /* Reduced from 25% to make it smaller */
+  cursor: pointer; /* Change the mouse cursor when hovering over the button */
+}
+
+.round-button-circle {
+  width: 90% !important;
+  height: 0 !important;
+  padding-bottom: 50% !important;
+  border-radius: 50% !important;
+  border: 5px solid #cfdcec !important; /* Reduced border to make it smaller */
+  overflow: hidden !important;
+  background: #4679BD !important;
+  box-shadow: 0 0 3px gray !important;
+  transition: background 0.3s; /* Smooth transition for background color change */
+}
+
+.round-button-circle:hover {
+  background: #30588e !important;
+}
+
+.round-button-circle:focus {
+  background: #2a4a6e !important; /* Slightly darker color when button is pressed */
+  cursor: pointer; !important
+}
+
+.round-button a {
+  display: block !important;
+  width: 100% !important;
+  padding-top: 50% !important;
+  padding-bottom: 70% !important;
+  line-height: 1em !important;
+  margin-top: -0.5em !important;
+  text-align: center !important;
+  color: #e2eaf3 !important;
+  font-family: Verdana !important;
+  font-size: 0.8em !important; /* Reduced font size to fit the smaller button */
+  font-weight: bold !important;
+  text-decoration: none !important;
+}
+
+
 .custom-textarea h2 {
 	color: #1B2559;
 	font-size: 18px;

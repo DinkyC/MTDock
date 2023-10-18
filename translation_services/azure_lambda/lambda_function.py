@@ -92,7 +92,7 @@ class AWSClient:
         try:
             response = requests.post(endpoint, json=translate_text, headers=self.headers, params=self.params)
             if response.status_code == 200:
-                return response
+                return response.status_code
         except Exception as e:
             return {"[ERROR]" : f"Error processing messages {e}"}
 
@@ -115,7 +115,7 @@ def lambda_handler(event, context):
             future_title = executor.submit(translator.translate, params_dict.get('azure_endpoint'), from_lang, to_lang, 
                                                                                     parsed_message.get('title'), params_dict.get('azure_key'))
             future_text = executor.submit(translator.translate, params_dict.get('azure_endpoint'), from_lang, to_lang, 
-                                                                                    parsed_message.get('BodyText'), params_dict.get('azure_key'))
+                                                                                    parsed_message.get('text'), params_dict.get('azure_key'))
 
             # Capture translated results
             translated_title = future_title.result()
@@ -132,7 +132,7 @@ def lambda_handler(event, context):
         # Sending translated data to RDS
         try:
             send_to_rds_response = aws.insert_translation(params_dict["put_first"], translated_data)
-            if send_to_rds_response.status_code != 200:
+            if send_to_rds_response != 200:
                 raise e
         except Exception as e:
             return {"status": f"Failure {e}"}
@@ -142,5 +142,26 @@ def lambda_handler(event, context):
         "message_count": len(event.get('Records'))
     }
 # if __name__ == "__main__":
-#     lambda_handler(None, None)
+#     event= {
+#    "Records":[
+#       {
+#          "messageId":"19dd0b57-b21e-4ac1-bd88-01bbb068cb78",
+#          "receiptHandle":"MessageReceiptHandle",
+#          "body": "{\"id\": 300, \"title\": \"Report: California Should Keep Pot Taxes Low\", \"text\": \"SAN FRANCISCO (AP) \u2014 A blue-ribbon panel says curtailing the illegal marijuana market in California should be the primary goal of legalizing the drug\u2019s recreational use in the state, and not developing another tax source. ...\", \"to_lang\": \"es\", \"from_lang\": \"en\"}",
+#          "attributes":{
+#             "ApproximateReceiveCount":"1",
+#             "SentTimestamp":"1545084659183",
+#             "SenderId":"AIDAIENQZJOLO23YVJ4VO",
+#             "ApproximateFirstReceiveTimestamp":"1545084659187"
+#          },
+#          "messageAttributes":{},
+#          "md5OfBody":"[MD5 hash]",
+#          "eventSource":"aws:sqs",
+#          "eventSourceARN":"arn:aws:sqs:us-east-1:123456789012:MyQueue",
+#          "awsRegion":"us-east-1"
+#       }
+#    ]
+# }
+#
+#     lambda_handler(event, None)
 

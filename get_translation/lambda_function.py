@@ -11,7 +11,7 @@ logger.setLevel(logging.INFO)
 class HTDatabase:
     def construct_query(self, title_column, text_column, table, checksum_column, **kwargs):
         VALID_TABLES = ['final_translation', 'first_translation']
-        VALID_COLUMNS = ['gcp_text', 'gcp_title', 'azure_text', 'azure_title', 'aws_title', 'aws_text',
+        VALID_COLUMNS = ['gcp_text', 'gcp_title', 'azure_text', 'azure_title', 'aws_title', 'aws_text', 
                          'gcp_checksum', 'aws_checksum', 'azure_checksum', 'title', 'BodyText', 'checksum']
         
         # Sanitize table and column names
@@ -23,7 +23,7 @@ class HTDatabase:
             raise ValueError("Invalid column name for text_column")
         if checksum_column not in VALID_COLUMNS:
             raise ValueError("Invalid column name for checksum_column")
-
+        
         base_query = f"SELECT id, {title_column}, {text_column}, {checksum_column} FROM {table}"
         conditions = []
         params = []
@@ -31,16 +31,30 @@ class HTDatabase:
         if kwargs.get('title'):
             conditions.append(f"{title_column} = %s")
             params.append(kwargs['title'])
+        
+        # Adjust the id condition based on direction
         if kwargs.get('id'):
-            conditions.append("id = %s")
+            if kwargs.get('direction') == 'next':
+                conditions.append(f"id > %s")
+            elif kwargs.get('direction') == 'prev':
+                conditions.append(f"id < %s")
+            else:
+                conditions.append(f"id = %s")
             params.append(kwargs['id'])
 
         if conditions:
             base_query += " WHERE " + " AND ".join(conditions)
+        else:
+            base_query += " WHERE status='pending' "
 
-        base_query += " LIMIT 1"
-        
+        # Adjust the ORDER BY clause based on direction
+        if kwargs.get('direction') == 'prev':
+            base_query += " ORDER BY id DESC LIMIT 1"
+        else:
+            base_query += " ORDER BY id ASC LIMIT 1"
+
         return base_query, params
+
 
     def get_database_credentials(self):
         secret = self.get_secret()
@@ -102,6 +116,8 @@ def handler(event,context):
     checksum_column = queryStringParameters.get("checksum_column")
     table = queryStringParameters.get("table")
 
+    direction = queryStringParameters.get("direction")
+
     if not id:
         logger.info("No id provided.")
     if not title:
@@ -109,7 +125,7 @@ def handler(event,context):
 
     try:
         if table == 'first_translation':
-            query, params = db.construct_query(title_column, text_column, table, checksum_column, title=title, id=id)
+            query, params = db.construct_query(title_column, text_column, table, checksum_column, title=title, id=id, direction=direction)
         else:
             query, params = db.construct_query('title', 'BodyText', table, 'checksum', title=title, id=id)
     except Exception as e:
@@ -138,9 +154,9 @@ def handler(event,context):
             return db.log_err("[ERROR]: Cannot retrieve query data.\n{}".format(
                 traceback.format_exc()))
 
-        checksum = result[0][3].hex()
         # If there's a result, process it
         if result:
+            checksum = result[0][3].hex()
             # Convert the tuple to a dictionary
             entry = {
                 "id": result[0][0],
@@ -170,4 +186,5 @@ def handler(event,context):
             cnx.close()
         except: 
             pass 
+
 

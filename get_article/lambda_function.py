@@ -3,12 +3,13 @@ import logging
 import traceback
 import os 
 import json
-
+import pdb
+import boto3
 logger=logging.getLogger()
 logger.setLevel(logging.INFO)
 
 class HTDatabase:
-    def construct_query(title=None, id=None):
+    def construct_query(self, title=None, id=None):
         base_query = "SELECT id, title, BodyText FROM HighTimes"
         conditions = []
         params = []
@@ -67,10 +68,16 @@ class HTDatabase:
             ssl={'ssl': True}
         )
 
-    def log_err(errmsg):
+    def log_err(self, errmsg):
         logger.error(errmsg)
-        return {"body": errmsg , "headers": {}, "statusCode": 400,
-            "isBase64Encoded":"false"}
+        return {"body": errmsg , 
+                "headers" : {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET,OPTIONS',
+                    }, 
+                "statusCode": 400,
+                "isBase64Encoded":"false"
+                }
 
 logger.info("Cold start complete.") 
 
@@ -91,9 +98,13 @@ def handler(event,context):
     try:
         query, params = db.construct_query(title=title, id=id)
     except Exception as e:
-        db.logger.error(f"[ERROR]: Cannot construct query. {e}")
+        logger.error(f"[ERROR]: Cannot construct query. {e}")
         return {
             "statusCode": 500,
+            "headers" : {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET,OPTIONS',
+                },
             "body": f"[ERROR]: Cannot construct query.\n{str(e)}"
         }
 
@@ -121,15 +132,16 @@ def handler(event,context):
             entry = {
                 "id": result[0][0],
                 "title": result[0][1],
-                "BodyText": result[0][2]
+                "text": result[0][2]
             }
         else:
             entry = {}
         return {
             "body": json.dumps(entry),  # Serialize list to JSON
-            "headers": {
-                "Content-Type": "application/json"  # Set appropriate response header
-            },
+            "headers" : {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET,OPTIONS',
+                },
             "statusCode": 200,
             "isBase64Encoded": "false"
         }
@@ -143,6 +155,53 @@ def handler(event,context):
         try:
             cnx.close()
         except: 
-            pass 
+            pass
+
+if __name__ == "__main__":
+    event = {
+  "resource": "/your/resource/path",
+  "path": "/your/resource/path",
+  "httpMethod": "POST",
+  "headers": {
+    "Accept": "*/*",
+    "Content-Type": "application/json",
+    "Host": "your-api-id.execute-api.your-region.amazonaws.com",
+    "User-Agent": "curl/7.53.1"
+  },
+  "multiValueHeaders": {
+    "Accept": [
+      "*/*"
+    ],
+    "Content-Type": [
+      "application/json"
+    ]
+  },
+  "queryStringParameters": {
+    "id": 2
+  },
+  "multiValueQueryStringParameters": {
+    "param1": [
+      "value1"
+    ],
+    "param2": [
+      "value2",
+      "value2B"
+    ]
+  },
+  "pathParameters": {
+    "pathParam1": "value1"
+  },
+  "stageVariables": {
+    "stageVarName": "stageVarValue"
+  },
+  "requestContext": {
+    "requestId": "request-id",
+    "path": "/your/resource/path",
+    "httpMethod": "POST",
+    "stage": "prod"
+  },
+  "isBase64Encoded": False 
+}
+    handler(event, None)
 
 

@@ -103,6 +103,14 @@ def handler(event, context):
             try:
                 # Execute the INSERT statement with the data
                 cursor.execute(insert_statement, (data.get("id"), data.get("title"), data.get("text"), data.get("comments", None), data.get('rating'), checksum))
+
+                # Update status in first_translation table after successful insert
+                update_status_statement = """
+                UPDATE first_translation
+                SET status = 'done'
+                WHERE id = %s;
+                """
+                cursor.execute(update_status_statement, (data.get("id"),))
             except Exception as e:
                 return {
                     "statusCode": 500,

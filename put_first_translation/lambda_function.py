@@ -56,7 +56,6 @@ class HTDatabase:
 
     def compute_checksum(self, data):
         return hashlib.sha256(str(data).encode('utf-8')).digest()
-x
 
 def handler(event, context):
     body = event.get('body', '{}')
@@ -123,13 +122,15 @@ def handler(event, context):
 
             # Create an INSERT statement
             insert_statement = f"""
-                INSERT INTO first_translation (id, {title_column}, {text_column}, {checksum_column})
-                VALUES (%s, %s, %s, %s)
-                ON DUPLICATE KEY UPDATE 
+                INSERT INTO first_translation (id, {title_column}, {text_column}, {checksum_column}, status)
+                VALUES (%s, %s, %s, %s, 'pending')
+                ON DUPLICATE KEY UPDATE
                 {title_column} = VALUES({title_column}),
                 {text_column} = VALUES({text_column}),
-                {checksum_column} = VALUES({checksum_column});
+                {checksum_column} = VALUES({checksum_column}),
+                status = 'pending';
             """
+
             try:
                 # Execute the INSERT statement with the data
                 cursor.execute(insert_statement, (data.get("id"), data.get("title"), data.get("text"), checksum))

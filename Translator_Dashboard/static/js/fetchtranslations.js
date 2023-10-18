@@ -22,6 +22,11 @@ function fetchNextTranslation() {
     fetchTranslation(currentIndex);
 }
 
+function fetchPrevTranslation() {
+    currentIndex -= 1;
+    fetchTranslation(currentIndex);
+}
+
 // Initial fetch when the page loads
 window.onload = function() {
     fetchTranslation(currentIndex);

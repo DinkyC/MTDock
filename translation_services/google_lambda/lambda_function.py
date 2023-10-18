@@ -128,7 +128,7 @@ def lambda_handler(event, context):
         to_lang = parsed_message.get('to_lang')
 
         translated_title = translator.translate(parsed_message.get('title'), from_lang, to_lang, params_dict.get('project_id'))
-        translated_text = translator.translate(parsed_message.get('BodyText'), from_lang, to_lang, params_dict.get('project_id'))
+        translated_text = translator.translate(parsed_message.get('text'), from_lang, to_lang, params_dict.get('project_id'))
 
         translated_data = {
             "title": translated_title,
@@ -147,8 +147,14 @@ def lambda_handler(event, context):
             return {"status": f"Failure {e}"}
 
     return {
-        "status": "success",
-        "message_count": len(event.get('Records'))
+        "body": "success",
+        "message_count": len(event.get('Records')),
+        "headers" : {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET,OPTIONS',
+            }, 
+        "status_code": 200,
+        "isBase64Encoded": "false"
     }
 # if __name__ == "__main__":
 #     event={"from_lang": "en", "to_lang": "es"}
