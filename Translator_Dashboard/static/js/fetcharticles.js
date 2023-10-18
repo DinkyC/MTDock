@@ -22,6 +22,15 @@ function fetchTranslationForService(service) {
         .then(response => response.json());
 }
 
+function fetchTranslationForServicePrev(service) {
+    let columns = getProviderColumns(service);
+    const [titleColumn, textColumn, checksumColumn, table] = columns;
+
+    return fetch(`${CONFIG.API_ENDPOINT}/get-translation?title_column=${titleColumn}&text_column=${textColumn}&checksum_column=${checksumColumn}&table=${table}&direction=prev&id=${currentIndex}`)
+        .then(response => response.json());
+   
+}
+
 
 function fetchOriginalArticle(id) {
     fetch(`${CONFIG.API_ENDPOINT}/get-article?id=${id}`)
@@ -76,11 +85,63 @@ function updateTranslationElements() {
     });
 }
 
+function updateTranslationElementsPrev() {
+    let promises = [];
+
+    // AWS
+    promises.push(fetchTranslationForServicePrev('aws')
+        .then(data => {
+            if (Object.keys(data).length !== 0) {
+                const awsTextarea = document.getElementById('awsTranslation');
+                if (awsTextarea) awsTextarea.value = data.title + "\n\n" + data.text;
+            }
+            return data;
+        }));
+
+    // Google Cloud
+    promises.push(fetchTranslationForServicePrev('gcp')
+        .then(data => {
+            if (Object.keys(data).length !== 0) {
+                const gcpTextarea = document.getElementById('googleTranslation');
+                if (gcpTextarea) gcpTextarea.value = data.title + "\n\n" + data.text;
+            }
+            return data;
+        }));
+
+    // Microsoft Azure
+    promises.push(fetchTranslationForServicePrev('azure')
+        .then(data => {
+            if (Object.keys(data).length !== 0) {
+                const azureTextarea = document.getElementById('azureTranslation');
+                if (azureTextarea) azureTextarea.value = data.title + "\n\n" + data.text;
+            }
+            return data;
+        }));
+
+    // When all translations have been fetched
+    Promise.all(promises).then(results => {
+        let nonEmptyResult = results.find(data => Object.keys(data).length !== 0);
+    
+        if (nonEmptyResult) {
+            currentIndex = nonEmptyResult.id;
+            fetchOriginalArticle(currentIndex);
+        }
+    });
+}
+
 // Event listener for 'Next Article' button
 // Using jQuery to select the button and attach an event
 $('.custom-button:contains("Next Article")').click(function() {
     updateTranslationElements();
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    var prevButton = document.querySelector('.custom-button');
+    if (prevButton) {
+        prevButton.addEventListener('click', updateTranslationElementsPrev);
+    }
+});
+
 
 // Initialize when the document is ready
 $(document).ready(function() {

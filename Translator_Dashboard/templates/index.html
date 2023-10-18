@@ -6,6 +6,9 @@
 				</div>
 				<div class="row justify-content-end">
 					<div class="col-auto">
+						<button class="custom-button">Previous Article</button>
+					</div>
+					<div class="col-auto">
 						<button class="custom-button">Next Article</button>
 					</div>
 				</div>
@@ -115,15 +118,19 @@
                         }
                 </script>
                 <script>
-                    document.querySelectorAll('#rating').forEach(function(element) {
-                        element.addEventListener('click', function(e) {
-                            let action = 'add';
-                            for (const span of this.children) {
-                                span.classList[action]('active');
-                                if (span === e.target) action = 'remove';
-                            }
+                    $(document).ready(function() {
+                        $('textarea').each(function() {
+                            // Save the original height for later
+                            $(this).data('original-height', this.scrollHeight);
+
+                            this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:auto;');
+                        }).on('input', function() {
+                            this.style.height = 'auto';
+                            this.style.height = (this.scrollHeight) + 'px';
+                        }).on('focusout', function() {
+                            // Restore the original height when the textarea loses focus
+                            this.style.height = $(this).data('original-height') + 'px';
                         });
                     });
-
                 </script>
                 {% endblock %}

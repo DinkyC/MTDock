@@ -7,7 +7,7 @@ from botocore.exceptions import ClientError
 import hashlib
 import concurrent.futures
 import uuid
-import pdb
+#import pdb
 
 class TranslationHander:
     def __init__(self):
