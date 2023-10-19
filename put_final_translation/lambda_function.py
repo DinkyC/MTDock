@@ -119,11 +119,20 @@ def handler(event, context):
                     "isBase64Encoded": "false",
                 }
 
-            # Create an INSERT statement
-            insert_statement = """
-            INSERT INTO final_translation (id, title, BodyText, comments, aws_rating, gcp_rating, azure_rating, checksum) 
+            insert_or_update_statement = """
+            INSERT INTO final_translation 
+            (id, title, BodyText, comments, aws_rating, gcp_rating, azure_rating, checksum) 
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE 
+            title = VALUES(title), 
+            BodyText = VALUES(BodyText), 
+            comments = VALUES(comments), 
+            aws_rating = VALUES(aws_rating), 
+            gcp_rating = VALUES(gcp_rating), 
+            azure_rating = VALUES(azure_rating), 
+            checksum = VALUES(checksum);
             """
+
             try:
                 # Execute the INSERT statement with the data
                 cursor.execute(
