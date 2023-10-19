@@ -1,34 +1,39 @@
+let currentIndex = 1;
 
-let currentIndex = 100; // To keep track of the current translation being shown
-
-function fetchTranslation(index) {
-    fetch(`${CONFIG.API_ENDPOINT}/get-translation?table=final_translation&id=${index}`) // Including query parameter for index
+function fetchTranslation(index, dir) {
+    fetch(`${CONFIG.API_ENDPOINT}/get-translation?table=final_translation&direction=${dir}&id=${currentIndex}`)
         .then(response => response.json())
         .then(data => {
-            const titleElement = document.getElementById('title');
-            const textElement = document.getElementById('text');
+            document.getElementById('title').innerText = data.title;
+            document.getElementById('text').innerText = data.text;
+            
+            currentIndex = data.id;  // Assuming the API returns the id of the fetched translation
 
-            titleElement.innerText = data.title;
-            textElement.innerText = data.text;
+            // Update the hidden input's value
+            document.getElementById('currentIndexInput').value = currentIndex;
+
         })
         .catch(error => {
             console.error('Error fetching translation:', error);
         });
 }
 
-// Function to handle the 'Next' button click
-function fetchNextTranslation() {
-    currentIndex += 1; // Incrementing the index to fetch the next translation
-    fetchTranslation(currentIndex);
-}
 
-function fetchPrevTranslation() {
-    currentIndex -= 1;
-    fetchTranslation(currentIndex);
-}
-
-// Initial fetch when the page loads
 window.onload = function() {
-    fetchTranslation(currentIndex);
-}
+    // Event listeners for the buttons
+    document.querySelectorAll('.custom-button').forEach(function(button) {
+        if (button.textContent.includes("Next Translation")) {
+            button.addEventListener('click', function() {
+                fetchTranslation(currentIndex, 'next');
+            });
+        } else if (button.textContent.includes("Previous Translation")) {
+            button.addEventListener('click', function() {
+                fetchTranslation(currentIndex, 'prev');
+            });
+        }
+    });
+
+    // Initial fetch when the window loads
+    fetchTranslation(currentIndex, 'next');
+};
 

@@ -184,30 +184,40 @@ def submit_translations():
 
     comments = request.form.get('CommentsContent')
 
+    # Before constructing the data dictionary
+    if not AWSRating or not GCPRating or not AzureRating or not title or not text:
+        flash('Some required fields are missing!', 'danger')
+        return redirect(url_for('dashboard'))
+
     data = {
             "id": int(id),
             "title": title,
-            "text": text
+            "text": text,
+            "comments": comments,
+            "aws_rating": int(AWSRating),
+            "gcp_rating": int(GCPRating),
+            "azure_rating": int(AzureRating)
+            }
+    
+    check = {
+        "title": title,
+        "text": text,
+        "id": int(id)
             }
 
-    checksum = aws.compute_checksum(data)
+    checksum = aws.compute_checksum(check)
 
-    data["comments"] = comments
-    data["aws_rating"] = AWSRating
-    data["gcp_rating"] = GCPRating
-    data["azure_rating"] = AzureRating
     data["checksum"] = checksum.hex()
    
     try:
-        response = requests.post(params_dict.get('put_final'), data=json.dumps(data), headers={'Content-Type': 'application/json'})
+        response = requests.post(params_dict.get('put_final'), json=data, headers={'Content-Type': 'application/json'})
         if response.status_code != 200:
-            raise Exception(f"Unexpected status code: {response.content} {data}")
+            raise Exception(f"Unexpected status code: {response.content}")
         flash('Successfully submitted!', 'success')
     except Exception as e:
         flash(f'Incorrect submission. Please check submission fields. Error: {e}', 'danger')
 
-
-    return render_template('index.html')
+    return redirect(url_for('dashboard'))  
 
 
 

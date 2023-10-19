@@ -136,7 +136,7 @@ def handler(event, context):
             try:
                 # Execute the INSERT statement with the data
                 cursor.execute(
-                    insert_statement,
+                    insert_or_update_statement,
                     (
                         data.get("id"),
                         data.get("title"),

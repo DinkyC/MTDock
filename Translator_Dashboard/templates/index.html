@@ -8,7 +8,7 @@
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}
-                            <div class="alert alert-{{ category }}">
+                            <div class="alert alert-{{ category }} fadeout">
                                 {{ message }}
                             </div>
                         {% endfor %}
@@ -176,4 +176,11 @@
                         });
                     }
                 </script>
-        {% endblock %}
+                <script>
+                    $(document).ready(function() {
+                        setTimeout(function() {
+                            $('.fadeout').fadeOut('slow');
+                        }, 5000);  // 5 seconds 
+                    });
+                </script>
+            {% endblock %}

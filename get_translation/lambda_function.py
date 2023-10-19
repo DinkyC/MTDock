@@ -60,10 +60,13 @@ class HTDatabase:
                 conditions.append(f"id = %s")
             params.append(kwargs["id"])
 
-        if conditions:
+        if table == 'final_translation':
             base_query += " WHERE " + " AND ".join(conditions)
         else:
             base_query += " WHERE status='pending' "
+            if conditions:
+                base_query += " AND " + " AND ".join(conditions)
+
 
         # Adjust the ORDER BY clause based on direction
         if kwargs.get("direction") == "prev":

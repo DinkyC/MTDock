@@ -7,17 +7,24 @@
             <div class="row mt-4">
                 <div class="col">
                     <h1>Final Translations</h1>
+                        <input type="hidden" id="currentIndexInput" name="currentIndex" value="">
                     <h2 id="title"></h2>
                     <p id="text"></p>
-                    <button onclick="fetchPrevTranslation()" class="btn btn-outline-primary mr-2">
-                        <i class="fas fa-arrow-left"></i> Previous
-                    </button>
-                    <button onclick="fetchNextTranslation()" class="btn btn-outline-primary">
-                        Next <i class="fas fa-arrow-right"></i>
-                    </button>
+				<div class="row justify-content-between">
+					<div class="col-auto">
+						<button class="custom-button">
+                            Previous Translation
+                        </button>
+					</div>
+					<div class="col-auto">
+						<button class="custom-button">
+                            Next Translation
+                        </button>
+					</div>
+				</div>
                 </div>
             </div>
-
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script src="../static/js/config.js"></script>
             <script src="../static/js/fetchtranslations.js"></script>
     {% endblock %}
