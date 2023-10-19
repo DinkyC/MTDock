@@ -4,20 +4,31 @@
 				<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 					<h1 class="h2">HT Translator</h1>
 				</div>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
 				<div class="row justify-content-end">
 					<div class="col-auto">
-						<button class="custom-button">Previous Article</button>
+						<button class="custom-button">Previous Translation</button>
 					</div>
 					<div class="col-auto">
-						<button class="custom-button">Next Article</button>
+						<button class="custom-button">Next Translation</button>
 					</div>
 				</div>
+            <form action="/submit_translation" method="post">
+                <input type="hidden" id="currentIndexInput" name="currentIndex" value="">
 				<div class="row mt-4">
 					<div class="col">
 						<h2 class="section-title">Original Article</h2>
-						<form action="#" method="post">
-                            <textarea autosize spellcheck="false" class="form-control custom-textarea" id="originalArticle" name="articleContent"></textarea>
-                        </form>
+                            <textarea autosize spellcheck="false" class="form-control custom-textarea" id="originalArticle"></textarea>
 					</div>
 				</div>
 				<div class="row mt-4">
@@ -31,9 +42,7 @@
 				<div class="row mt-4">
 					<div class="col">
 						<h2 class="section-title">Base translation</h2>
-						<form action="#" method="post">
-                            <textarea autosize spellcheck="false" class="form-control custom-textarea" id="baseTranslation" name="articleContent" style="resize: both;"></textarea>
-                        </form>
+                            <textarea autosize spellcheck="false" class="form-control custom-textarea" id="baseTranslation" name="finalTranslation" style="resize: both;"></textarea>
 					</div>
 				</div>
 				<div class="row mt-4">
@@ -44,16 +53,15 @@
                                 <a href="javascript:void(0)" onclick="copyToBaseTranslation('awsTranslation')" class="round-button"></a>
                             </div>
                         </div>
-						<form action="#" method="post">
-                            <textarea autosize spellcheck="false" class="form-control custom-textarea" id="awsTranslation" name="articleContent"></textarea>
-                        </form>
-                        <div id='rating'>
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                            <span></span>
+                            <textarea autosize spellcheck="false" class="form-control custom-textarea" id="awsTranslation"></textarea>
+                        <div class='rating' id='AWS_rating'>
+                            <span onclick="setRating('AWS', 1)"></span>
+                            <span onclick="setRating('AWS', 2)"></span>
+                            <span onclick="setRating('AWS', 3)"></span>
+                            <span onclick="setRating('AWS', 4)"></span>
+                            <span onclick="setRating('AWS', 5)"></span>
                         </div>
+                        <input type="hidden" id="AWSRatingInput" name="AWSRating" value="">
 					</div>
 					<div class="col-md-4"> <!-- Ocultar en pantallas pequeñas -->
 						<h2 class="section-title">Google Cloud</h2>
@@ -62,16 +70,15 @@
                                 <a href="javascript:void(0)" onclick="copyToBaseTranslation('googleTranslation')" class="round-button"></a>
                             </div>
                         </div>
-						<form action="#" method="post">
-                            <textarea autosize spellcheck="false" class="form-control custom-textarea" id="googleTranslation" name="articleContent"></textarea>
-                        </form>
-                        <div id='rating'>
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                            <span></span>
+                            <textarea autosize spellcheck="false" class="form-control custom-textarea" id="googleTranslation"></textarea>
+                        <div class='rating' id='GCP_rating'>
+                            <span onclick="setRating('GCP', 1)"></span>
+                            <span onclick="setRating('GCP', 2)"></span>
+                            <span onclick="setRating('GCP', 3)"></span>
+                            <span onclick="setRating('GCP', 4)"></span>
+                            <span onclick="setRating('GCP', 5)"></span>
                         </div>
+                        <input type="hidden" id="GCPRatingInput" name="GCPRating" value="">
 					</div>
 					<div class="col-md-4"> <!-- Ocultar en pantallas pequeñas -->
 						<h2 class="section-title">Microsoft Azure</h2>
@@ -80,23 +87,29 @@
                                 <a href="javascript:void(0)" onclick="copyToBaseTranslation('azureTranslation')" class="round-button"></a>
                             </div>
                         </div>
-						<form action="#" method="post">
-                            <textarea autosize spellcheck="false" class="form-control custom-textarea" id="azureTranslation" name="articleContent"></textarea>
-                        </form>
-                        <div id='rating'>
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                            <span></span>
+                            <textarea autosize spellcheck="false" class="form-control custom-textarea" id="azureTranslation"></textarea>
+                        <div class='rating' id='Azure_rating'>
+                            <span onclick="setRating('Azure', 1)"></span>
+                            <span onclick="setRating('Azure', 2)"></span>
+                            <span onclick="setRating('Azure', 3)"></span>
+                            <span onclick="setRating('Azure', 4)"></span>
+                            <span onclick="setRating('Azure', 5)"></span>
                         </div>
+                        <input type="hidden" id="AzureRatingInput" name="AzureRating" value="">
+					</div>
+				</div>
+				<div class="row mt-4">
+					<div class="col">
+						<h2 class="section-title">Comments</h2>
+                            <textarea autosize spellcheck="false" class="form-control custom-textarea h-55" id="baseTranslation" name="CommentsContent" style="resize: both;"></textarea>
 					</div>
 				</div>
 				<div class="row mt-4">
 					<div class="col text-end">
-						<button class="custom-button">Save new version</button>
+						<button type="submit" class="custom-button">Save new version</button>
 					</div>
 				</div>
+            </form>
                 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                 <script src="../static/js/config.js"></script>
                 <script src="../static/js/fetcharticles.js"></script>
@@ -133,4 +146,34 @@
                         });
                     });
                 </script>
-                {% endblock %}
+                <script>
+                    function setRating(platform, ratingValue) {
+                        let ratingElementId;
+                        let inputElementId;
+
+                        if (platform === 'GCP') {
+                            ratingElementId = 'GCP_rating';
+                            inputElementId = 'GCPRatingInput';
+                        } else if (platform === 'Azure') {
+                            ratingElementId = 'Azure_rating';  // Ensure this ID matches the one in your HTML
+                            inputElementId = 'AzureRatingInput';
+                        } else if (platform === 'AWS') {
+                            ratingElementId = 'AWS_rating';  // If you have an element for AWS, set its ID here
+                            inputElementId = 'AWSRatingInput';
+                        }
+
+                        // Set the value to the appropriate input
+                        document.getElementById(inputElementId).value = ratingValue;
+
+                        // Update the visual representation of stars
+                        const stars = document.querySelectorAll(`#${ratingElementId} span`);
+                        stars.forEach((star, index) => {
+                            if (index < ratingValue) {
+                                star.classList.add('active');
+                            } else {
+                                star.classList.remove('active');
+                            }
+                        });
+                    }
+                </script>
+        {% endblock %}

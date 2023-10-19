@@ -47,7 +47,7 @@ body, html {
 	margin-top: 10px;
 }
 .sign-in-button {
-	margin-top: 30px; /* Margen arriba de 30px */
+	margin-top: auto; /* Margen arriba de 30px */
 }
 /* Estilo para los campos de email y password */
 .form-control {
@@ -89,6 +89,10 @@ body, html {
 	background-color: #ffffff !important; /* Color de fondo de la barra lateral */
 	border-radius: 20px; /* Borde redondeado de la barra lateral */
 	box-shadow: 0px 17px 40px 4px rgba(112, 144, 176, 0.11); /* Sombra */
+    height: auto;
+    min-height: 100vh;
+    display: flex;           
+    flex-direction: column;
 }
 .sidebar-logo {
 	text-align: center;
@@ -112,11 +116,11 @@ body, html {
     word-wrap: break-word;
 }
 
-#rating { font-size: 0; }
-#rating span { font-size: 40px; }
-#rating span::before { content: "☆"; }
-#rating span.active::before {content: "★"; }
-#rating span:hover { cursor: pointer; }
+.rating { font-size: 0; }
+.rating span { font-size: 40px; }
+.rating span::before { content: "☆"; }
+.rating span.active::before {content: "★"; }
+.rating span:hover { cursor: pointer; }
 
 .round-button {
   width: 7% !important; /* Reduced from 25% to make it smaller */
@@ -141,7 +145,7 @@ body, html {
 
 .round-button-circle:focus {
   background: #2a4a6e !important; /* Slightly darker color when button is pressed */
-  cursor: pointer; !important
+  cursor: pointer !important;
 }
 
 .round-button a {
@@ -169,9 +173,11 @@ body, html {
 	margin: 10px 10px;
 }
 .logout-button {
+    flex-grow: 1;
 	margin-bottom: auto;
 	padding: 10px 0;
 	text-align: center;
+    height: auto;
 }
 .section-title {
 	font-size: 18px;

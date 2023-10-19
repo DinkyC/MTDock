@@ -80,6 +80,7 @@ function updateTranslationElements() {
     
         if (nonEmptyResult) {
             currentIndex = nonEmptyResult.id;
+            updateCurrentIndexInput();
             fetchOriginalArticle(currentIndex);
         }
     });
@@ -124,17 +125,30 @@ function updateTranslationElementsPrev() {
     
         if (nonEmptyResult) {
             currentIndex = nonEmptyResult.id;
+            updateCurrentIndexInput();
             fetchOriginalArticle(currentIndex);
         }
     });
 }
 
+function updateCurrentIndexInput() {
+    console.log("function is enabled")
+    const currentIndexInput = document.getElementById('currentIndexInput');
+    if (currentIndexInput) {
+        currentIndexInput.value = currentIndex;
+        console.log("Updated currentIndex to:", currentIndex);  // Debugging line
+    } else {
+        console.log("currentIndexInput not found!");  // Debugging line
+    }
+}
+
 // Event listener for 'Next Article' button
 // Using jQuery to select the button and attach an event
-$('.custom-button:contains("Next Article")').click(function() {
+$('.custom-button:contains("Next Translation")').click(function() {
     updateTranslationElements();
 });
 
+// Event listener for 'Previous Article' button
 document.addEventListener('DOMContentLoaded', function() {
     var prevButton = document.querySelector('.custom-button');
     if (prevButton) {

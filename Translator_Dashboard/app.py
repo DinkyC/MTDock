@@ -10,12 +10,18 @@ from datetime import timedelta
 import os
 import boto3
 import json
+import hashlib
+import requests
 pymysql.install_as_MySQLdb()
 
 
 #CA_CERT = os.environ['CA_CERT']
 
 class AWSClient:
+    def __init__(self):
+        self.ssm = boto3.client("ssm")
+        self.params_keys = ["put_final"]
+
     def get_database_credentials(self):
         secret = self.get_secret()
         secret_dict = json.loads(secret)
@@ -32,6 +38,21 @@ class AWSClient:
             return get_secret_value_response['SecretString']
         except Exception as e:
             raise e
+
+    def get_parameters_from_store(self):
+        response = self.ssm.get_parameters(Names=self.params_keys, WithDecryption=True)
+
+        # Construct a dictionary to hold the parameter values
+        params_dict = {}
+
+        for param in response["Parameters"]:
+            params_dict[param["Name"]] = param["Value"]
+
+        return params_dict
+    
+    def compute_checksum(self, data):
+        return hashlib.sha256(str(data).encode("utf-8")).digest()
+
 
     # def make_token(self):
     #     rds_client = boto3.client('rds')
@@ -69,6 +90,26 @@ def create_app():
     return app, db, login_manager, bcrypt
 
 app, db, login_manager, bcrypt = create_app()
+
+def extract_title_and_text(data):
+    # Step 1: Trim input
+    lines = data.strip().split('\n')
+    
+    # Step 2: Set default values
+    title = ""
+    text = ""
+    
+    # Extract title if it exists
+    if lines:
+        title = lines[0]
+    
+    # Extract text if it exists
+    if len(lines) > 1:
+        # Step 4: Handle multiple newlines by filtering out empty lines
+        text_lines = filter(bool, lines[1:])
+        text = "\n".join(text_lines)
+    
+    return title, text
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -125,6 +166,49 @@ def translations():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+@app.route('/submit_translation', methods=['POST'])
+@login_required
+def submit_translations():
+    aws = AWSClient()
+    params_dict = aws.get_parameters_from_store()
+
+    AWSRating = request.form.get('AWSRating')
+    GCPRating = request.form.get('GCPRating')
+    AzureRating = request.form.get('AzureRating')
+
+    id = request.form.get('currentIndex')
+
+    translation = request.form.get('finalTranslation')
+    title, text = extract_title_and_text(translation)
+
+    comments = request.form.get('CommentsContent')
+
+    data = {
+            "id": int(id),
+            "title": title,
+            "text": text
+            }
+
+    checksum = aws.compute_checksum(data)
+
+    data["comments"] = comments
+    data["aws_rating"] = AWSRating
+    data["gcp_rating"] = GCPRating
+    data["azure_rating"] = AzureRating
+    data["checksum"] = checksum.hex()
+   
+    try:
+        response = requests.post(params_dict.get('put_final'), data=json.dumps(data), headers={'Content-Type': 'application/json'})
+        if response.status_code != 200:
+            raise Exception(f"Unexpected status code: {response.content} {data}")
+        flash('Successfully submitted!', 'success')
+    except Exception as e:
+        flash(f'Incorrect submission. Please check submission fields. Error: {e}', 'danger')
+
+
+    return render_template('index.html')
+
 
 
 if __name__ == "__main__":

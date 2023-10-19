@@ -8,43 +8,45 @@ import pdb
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+
 class AWSClient:
     def __init__(self):
-        self.headers = {'Content-Type': 'application/json'}
-        self.params_keys = ['sqs_aws', 'sqs_azure', 'sqs_gcp', 'get_article']
-        self.ssm = boto3.client('ssm')  # Initialize this first
+        self.headers = {"Content-Type": "application/json"}
+        self.params_keys = ["sqs_aws", "sqs_azure", "sqs_gcp", "get_article"]
+        self.ssm = boto3.client("ssm")  # Initialize this first
         self.parameter_dict = self.get_parameters_from_store()  # Now you can call this
-        self.sqs = boto3.client('sqs', region_name='us-west-1')
-        
+        self.sqs = boto3.client("sqs", region_name="us-west-1")
+
     def get_parameters_from_store(self):
         response = self.ssm.get_parameters(Names=self.params_keys, WithDecryption=True)
 
         # Construct a dictionary to hold the parameter values
         params_dict = {}
 
-        for param in response['Parameters']:
-            params_dict[param['Name']] = param['Value']
+        for param in response["Parameters"]:
+            params_dict[param["Name"]] = param["Value"]
 
         return params_dict
- 
+
     def send_to_sqs(self, text, sqs_endpoint):
         self.sqs.send_message(
             QueueUrl=sqs_endpoint,
             MessageBody=json.dumps(text),
-            MessageGroupId='translation'
+            MessageGroupId="translation",
         )
 
     def call_api(self, id=None, title=None):
-        params = {'id': id, 'title': title}
-        response = requests.get(self.parameter_dict['get_article'], params=params)
+        params = {"id": id, "title": title}
+        response = requests.get(self.parameter_dict["get_article"], params=params)
         # Check if the request was successful
         response.raise_for_status()
         return response.text
 
+
 def lambda_handler(event, context):
     aws = AWSClient()
     queryStringParameters = event.get("queryStringParameters", {})
-    
+
     # Extract values or set to None if not provided
     id = queryStringParameters.get("id")
     title = queryStringParameters.get("title")
@@ -66,11 +68,8 @@ def lambda_handler(event, context):
     try:
         text = aws.call_api(id=id, title=title)
     except Exception as e:
-        return {
-            "statusCode": 500,
-            "body": f"ERROR: Cannot call api.\n{str(e)}"
-        }
-    
+        return {"statusCode": 500, "body": f"ERROR: Cannot call api.\n{str(e)}"}
+
     text = json.loads(text)
     text["to_lang"] = to_lang
     text["from_lang"] = from_lang
@@ -81,57 +80,42 @@ def lambda_handler(event, context):
             executor.submit(lambda: aws.send_to_sqs(text, aws_sqs))
             executor.submit(lambda: aws.send_to_sqs(text, azure_sqs))
             executor.submit(lambda: aws.send_to_sqs(text, gcp_sqs))
-        return {
-            "statusCode": 200,
-            "body": "Successfully sent to SQS."
-        }
+        return {"statusCode": 200, "body": "Successfully sent to SQS."}
     except Exception as e:
-        return {
-            "statusCode": 500,
-            "body": f"ERROR: Cannot call api.\n{str(e)}"
-        }
+        return {"statusCode": 500, "body": f"ERROR: Cannot call api.\n{str(e)}"}
+
+
 if __name__ == "__main__":
     event = {
-      "resource": "/your/resource/path",
-      "path": "/your/resource/path",
-      "httpMethod": "POST",
-      "headers": {
-        "Accept": "*/*",
-        "Content-Type": "application/json",
-        "Host": "your-api-id.execute-api.your-region.amazonaws.com",
-        "User-Agent": "curl/7.53.1"
-      },
-      "multiValueHeaders": {
-        "Accept": ["*/*"],
-        "Content-Type": ["application/json"]
-      },
-      "queryStringParameters": {
-        "id": 200,
-        "from_lang": "en",
-        "to_lang":"es"
-      },
-      "multiValueQueryStringParameters": {
-        "param1": ["value1"],
-        "param2": ["value2", "value2B"]
-      },
-      "pathParameters": {
-        "pathParam1": "value1"
-      },
-      "stageVariables": {
-        "stageVarName": "stageVarValue"
-      },
-      "requestContext": {
-        "requestId": "request-id",
+        "resource": "/your/resource/path",
         "path": "/your/resource/path",
         "httpMethod": "POST",
-        "stage": "prod"
-      },
-      "isBase64Encoded": "false"
+        "headers": {
+            "Accept": "*/*",
+            "Content-Type": "application/json",
+            "Host": "your-api-id.execute-api.your-region.amazonaws.com",
+            "User-Agent": "curl/7.53.1",
+        },
+        "multiValueHeaders": {"Accept": ["*/*"], "Content-Type": ["application/json"]},
+        "queryStringParameters": {"id": 200, "from_lang": "en", "to_lang": "es"},
+        "multiValueQueryStringParameters": {
+            "param1": ["value1"],
+            "param2": ["value2", "value2B"],
+        },
+        "pathParameters": {"pathParam1": "value1"},
+        "stageVariables": {"stageVarName": "stageVarValue"},
+        "requestContext": {
+            "requestId": "request-id",
+            "path": "/your/resource/path",
+            "httpMethod": "POST",
+            "stage": "prod",
+        },
+        "isBase64Encoded": "false",
     }
 
-    lambda_handler(event, None) 
+    lambda_handler(event, None)
 #
-#      
+#
 #
 #
 #
