@@ -7,18 +7,20 @@
 !get_article/*
 !push_to_fifo/
 !push_to_fifo/*
-!push_to_queue/
-!push_to_queue/*
 !put_final_translation/
 !put_final_translation/*
 !put_first_translation/
 !put_first_translation/*
-!get_translation/
-!get_translation/*
 !Translator_Dashboard/
 !Translator_Dashboard/**/**/*
 !translation_services/
 !translation_services/**/*
+!extra_code/
+!extra_code/**/*
+!get_first/
+!get_first/*
+!get_final/
+!get_final/*
 
 # Ignore zip files and env directories everywhere
 *.zip

@@ -102,9 +102,9 @@ def handler(event, context):
             # Check if the article already exists based on id and checksum
             select_statement = """
                 SELECT COUNT(*) FROM HighTimes.translations
-                WHERE text_id = %s AND checksum = %s
+                WHERE translation_id = %s AND checksum = %s
             """
-            cursor.execute(select_statement, (data.get("id"), checksum))
+            cursor.execute(select_statement, (data.get("translation_id"), checksum))
             result = cursor.fetchone()
 
             # If a row with the same id and checksum is found, it means the article already exists
@@ -120,31 +120,29 @@ def handler(event, context):
                 }
 
             insert_or_update_statement = """
-            INSERT INTO translations 
-            (text_id, providers_id, edited_content, lang_to, checksum) 
+            INSERT INTO edited_translations 
+            (text_id, edited_content, checksum) 
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             ON DUPLICATE KEY UPDATE 
-            title = VALUES(title), 
-            BodyText = VALUES(BodyText), 
-            comments = VALUES(comments), 
-            aws_rating = VALUES(aws_rating), 
-            gcp_rating = VALUES(gcp_rating), 
-            azure_rating = VALUES(azure_rating), 
+            text_id = VALUES(text_id),
+            edited_content = VALUES(edited_content),
             checksum = VALUES(checksum);
             """
 
             try:
+                if data.get("title"):
+                    loaded = {"title": data.get("title"), "text": data.get("text")}
+                else:
+                    loaded = {"text": data.get("text")}
+
+                json_data = json.dumps(loaded)
+
                 # Execute the INSERT statement with the data
                 cursor.execute(
                     insert_or_update_statement,
                     (
                         data.get("id"),
-                        data.get("title"),
-                        data.get("text"),
-                        data.get("comments", None),
-                        data.get("aws_rating"),
-                        data.get("gcp_rating"),
-                        data.get("azure_rating"),
+                        json_data,
                         checksum,
                     ),
                 )
@@ -156,6 +154,7 @@ def handler(event, context):
                 WHERE id = %s;
                 """
                 cursor.execute(update_status_statement, (data.get("id"),))
+
             except Exception as e:
                 return {
                     "statusCode": 500,
@@ -166,10 +165,71 @@ def handler(event, context):
                     },
                     "isBase64Encoded": "false",
                 }
+            
+            try:
+                AWS_PROVIDERS_ID = 1
+                GCP_PROVIDERS_ID = 2
+                AZURE_PROVIDERS_ID = 3
+
+                select_statement_id = """
+                SELECT translation_id 
+                FROM translations 
+                WHERE text_id = %s AND providers_id IN (%s, %s, %s);
+                """
+                
+                result = cursor.execute(select_statement_id, (data.get('id'), AWS_PROVIDERS_ID, AZURE_PROVIDERS_ID, GCP_PROVIDERS_ID))
+
+                aws_translation_id = result[0]
+                gcp_translation_id = result[1]
+                azure_translation_id = result[2]
+
+                insert_ratings = """
+                INSERT INTO ratings (translation_id, rating_value, providers_id)
+                VALUES 
+                    (%s, %s, %s),
+                    (%s, %s, %s),
+                    (%s, %s, %s)
+                ON DUPLICATE KEY UPDATE
+                    rating_value = VALUES(rating_value),
+                    providers_id = VALUES(providers_id);
+                """
+
+                # Prepare the parameters for the INSERT statement
+                params = (
+                    aws_translation_id, data.get("aws_rating"), AWS_PROVIDERS_ID,
+                    gcp_translation_id, data.get("gcp_rating"), GCP_PROVIDERS_ID,
+                    azure_translation_id, data.get("azure_rating"), AZURE_PROVIDERS_ID
+                )
+
+                # Execute the INSERT statement
+                cursor.execute(insert_ratings, params)
+
+            except Exception as e:
+                return db.log_err(
+                    "ERROR: Cannot execute INSERT statement for ratings.\n{}".format(
+                        traceback.format_exc()
+                    )
+                )
+
+            try:
+                insert_comments = f"""
+                INSERT INTO comments (text_id, comments)
+                VALUES (%s, %s)
+                ON DUPLICATE KEY UPDATE
+                    text_id=VALUES(text_id);
+                """
+                cursor.execute(insert_comments, (data.get("id"), data.get("comments")))
+
+            except Exception as e:
+                return db.log_err(
+                    "ERROR: Cannot execute INSERT statement for comments.\n{}".format(
+                        traceback.format_exc()
+                    )
+                )
 
         except Exception as e:
             return db.log_err(
-                "ERROR: Cannot execute INSERT statement.\n{}".format(
+                "ERROR: Cannot execute INSERT statements.\n{}".format(
                     traceback.format_exc()
                 )
             )

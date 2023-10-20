@@ -119,12 +119,14 @@ def handler(event, context):
 
             # Create an INSERT statement
             insert_statement = f"""
-                INSERT INTO translations (text_id, providers_id, content, checksum)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO translations (text_id, content, providers_id, lang_to, lang_from, checksum)
+                VALUES (%s, %s, %s, %s, %s, %s)
                 ON DUPLICATE KEY UPDATE
-                title = VALUES(title),
+                text_id = VALUES(text_id),
                 content = VALUES(content),
-                providers_id = VALUES(providers_id)
+                providers_id = VALUES(providers_id),
+                lang_to = VALUES(lang_to),
+                lang_from = VALUES(lang_from),
                 checksum = VALUES(checksum);
             """
             
@@ -139,7 +141,7 @@ def handler(event, context):
                 # Execute the INSERT statement with the data
                 cursor.execute(
                     insert_statement,
-                    (data.get("id"), json_data, data.get("providers_id"), checksum),
+                    (data.get("id"), json_data, data.get("providers_id"), data.get("lang_to"), data.get("lang_from"), checksum),
                 )
             except Exception as e:
                 return {
