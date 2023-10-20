@@ -7,21 +7,23 @@
             <div class="row mt-4">
                 <div class="col">
                     <h1>Final Translations</h1>
-                        <input type="hidden" id="currentIndexInput" name="currentIndex" value="">
-                    <h2 id="title"></h2>
-                    <p id="text"></p>
-				<div class="row justify-content-between">
-					<div class="col-auto">
-						<button class="custom-button">
-                            Previous Translation
-                        </button>
-					</div>
-					<div class="col-auto">
-						<button class="custom-button">
-                            Next Translation
-                        </button>
-					</div>
-				</div>
+                    <input type="hidden" id="currentIndexInput" name="currentIndex" value="">
+                    <div class="row justify-content-between" style="padding-bottom: 25px; padding-top: 25px;">
+                        <div class="col-auto">
+                            <button class="custom-button" id="prev-button">
+                                <span class="fas fa-arrow-left"></span>
+                            </button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="custom-button" id="next-button">
+                                <span class="fas fa-arrow-right"></span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-container">
+                        <h2 id="title"></h2>
+                        <p id="text"></p>
+                    </div>
                 </div>
             </div>
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

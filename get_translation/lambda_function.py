@@ -166,7 +166,7 @@ def handler(event, context):
             )
         else:
             query, params = db.construct_query(
-                "title", "BodyText", table, "checksum", title=title, id=id
+                "title", "BodyText", table, "checksum", direction=direction, title=title, id=id
             )
     except Exception as e:
         logger.error(f"[ERROR]: Cannot construct query. {e}")

@@ -3,7 +3,7 @@ import boto3
 import json
 import logging
 import concurrent.futures
-import pdb
+#import pdb
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -68,7 +68,17 @@ def lambda_handler(event, context):
     try:
         text = aws.call_api(id=id, title=title)
     except Exception as e:
-        return {"statusCode": 500, "body": f"ERROR: Cannot call api.\n{str(e)}"}
+        return {
+                "statusCode": 500,
+                "body": f"ERROR: Cannot call api.\n{str(e)}",
+                "headers": {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "GET,OPTIONS",
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                    },
+
+                }
 
     text = json.loads(text)
     text["to_lang"] = to_lang
@@ -80,40 +90,58 @@ def lambda_handler(event, context):
             executor.submit(lambda: aws.send_to_sqs(text, aws_sqs))
             executor.submit(lambda: aws.send_to_sqs(text, azure_sqs))
             executor.submit(lambda: aws.send_to_sqs(text, gcp_sqs))
-        return {"statusCode": 200, "body": "Successfully sent to SQS."}
+        return {
+                "statusCode": 200,  
+                "headers": {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "GET,OPTIONS",
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                "body": "Successfully sent to SQS."
+                }
     except Exception as e:
-        return {"statusCode": 500, "body": f"ERROR: Cannot call api.\n{str(e)}"}
+        return {
+                "statusCode": 500, 
+                "body": f"ERROR: Cannot call api.\n{str(e)}",
+                "headers": {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "GET,OPTIONS",
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                    },
+                }
 
 
-if __name__ == "__main__":
-    event = {
-        "resource": "/your/resource/path",
-        "path": "/your/resource/path",
-        "httpMethod": "POST",
-        "headers": {
-            "Accept": "*/*",
-            "Content-Type": "application/json",
-            "Host": "your-api-id.execute-api.your-region.amazonaws.com",
-            "User-Agent": "curl/7.53.1",
-        },
-        "multiValueHeaders": {"Accept": ["*/*"], "Content-Type": ["application/json"]},
-        "queryStringParameters": {"id": 200, "from_lang": "en", "to_lang": "es"},
-        "multiValueQueryStringParameters": {
-            "param1": ["value1"],
-            "param2": ["value2", "value2B"],
-        },
-        "pathParameters": {"pathParam1": "value1"},
-        "stageVariables": {"stageVarName": "stageVarValue"},
-        "requestContext": {
-            "requestId": "request-id",
-            "path": "/your/resource/path",
-            "httpMethod": "POST",
-            "stage": "prod",
-        },
-        "isBase64Encoded": "false",
-    }
-
-    lambda_handler(event, None)
+# if __name__ == "__main__":
+#     event = {
+#         "resource": "/your/resource/path",
+#         "path": "/your/resource/path",
+#         "httpMethod": "POST",
+#         "headers": {
+#             "Accept": "*/*",
+#             "Content-Type": "application/json",
+#             "Host": "your-api-id.execute-api.your-region.amazonaws.com",
+#             "User-Agent": "curl/7.53.1",
+#         },
+#         "multiValueHeaders": {"Accept": ["*/*"], "Content-Type": ["application/json"]},
+#         "queryStringParameters": {"id": 200, "from_lang": "en", "to_lang": "es"},
+#         "multiValueQueryStringParameters": {
+#             "param1": ["value1"],
+#             "param2": ["value2", "value2B"],
+#         },
+#         "pathParameters": {"pathParam1": "value1"},
+#         "stageVariables": {"stageVarName": "stageVarValue"},
+#         "requestContext": {
+#             "requestId": "request-id",
+#             "path": "/your/resource/path",
+#             "httpMethod": "POST",
+#             "stage": "prod",
+#         },
+#         "isBase64Encoded": "false",
+#     }
+#
+#     lambda_handler(event, None)
 #
 #
 #

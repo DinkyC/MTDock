@@ -132,7 +132,6 @@ function updateTranslationElementsPrev() {
 }
 
 function updateCurrentIndexInput() {
-    console.log("function is enabled")
     const currentIndexInput = document.getElementById('currentIndexInput');
     if (currentIndexInput) {
         currentIndexInput.value = currentIndex;
@@ -141,6 +140,60 @@ function updateCurrentIndexInput() {
         console.log("currentIndexInput not found!");  // Debugging line
     }
 }
+
+function regenerateTranslation() {
+    const currentIndex = document.getElementById('currentIndexInput').value;
+    const lang = document.getElementById('translateTo').value;
+
+    if (currentIndex && lang) {
+        // Show spinner
+        document.getElementById('spinner').style.display = 'block';
+
+        // Introduce a delay of 10 seconds
+        setTimeout(() => {
+            fetch(`${CONFIG.API_ENDPOINT}/push-to-fifo?id=${currentIndex}&from_lang=en&to_lang=${lang}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.text();
+            })
+            .then(data => {
+                updateTranslationElements();
+                // Hide spinner
+                document.getElementById('spinner').style.display = 'none';
+            })
+            .catch(error => {
+                console.error("There was a problem with the fetch operation:", error.message);
+                // Hide spinner
+                document.getElementById('spinner').style.display = 'none';
+            });
+        }, 10000); // 10 seconds delay
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const regenButton = document.getElementById('regenerate');
+    if (regenButton) {
+        regenButton.addEventListener('click', regenerateTranslation);
+    }
+});
+
+document.getElementById('dropdown').addEventListener('change', function() {
+    const currentLang = document.getElementById('translateTo');
+    if (currentLang) {
+        currentLang.value = this.value;
+    } else {
+        console.log("currentLang not found!")
+    }
+    console.log("Selected value:", this.value);
+});
 
 // Event listener for 'Next Article' button
 // Using jQuery to select the button and attach an event

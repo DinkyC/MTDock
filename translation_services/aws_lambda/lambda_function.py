@@ -7,7 +7,7 @@ import logging
 from botocore.exceptions import ClientError
 import hashlib
 import concurrent.futures
-
+import pdb
 
 class TranslationHandler:
     def __init__(self):
@@ -159,4 +159,13 @@ def lambda_handler(event, context):
 
 #
 # if __name__ == "__main__":
-#     lambda_handler(None, None)
+#     event = {
+#     "Records": [
+#         {
+#             "body": "{\"id\": 421, \"text\": \"value\", \"title\": \"hello\", \"from_lang\": \"en\", \"to_lang\": \"ja\"}"
+#         }
+#     ]
+# }
+#
+#
+#     lambda_handler(event, None)

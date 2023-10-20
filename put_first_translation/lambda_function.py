@@ -58,7 +58,10 @@ class HTDatabase:
         logger.error(errmsg)
         return {
             "body": errmsg,
-            "headers": {},
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET,OPTIONS",
+            },
             "statusCode": 400,
             "isBase64Encoded": "false",
         }
@@ -83,45 +86,21 @@ def handler(event, context):
         if data.get("checksum") != checksum.hex():
             return {
                 "statusCode": 500,
+                "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET,OPTIONS",
+                },
                 "body": "Data corruption. Checksums are not the same.",
             }
 
         cnx = db.make_connection()
         cursor = cnx.cursor()
 
-        queryStringParameters = event.get("queryStringParameters")
-        if not queryStringParameters:
-            return {
-                "statusCode": 400,
-                "body": "queryStringParameters not provided in the event.",
-            }
-
-        text_column = queryStringParameters.get("text_column")
-        if not text_column:
-            return {
-                "statusCode": 400,
-                "body": "text_column not provided in queryStringParameters.",
-            }
-
-        title_column = queryStringParameters.get("title_column")
-        if not title_column:
-            return {
-                "statusCode": 400,
-                "body": "title_column not provided in queryStringParameters.",
-            }
-
-        checksum_column = queryStringParameters.get("checksum_column")
-        if not title_column:
-            return {
-                "statusCode": 400,
-                "body": "checksum_column not provided in queryStringParameters.",
-            }
-
         try:
             # Check if the article already exists based on id and checksum
             select_statement = f"""
-                SELECT COUNT(*) FROM HighTimes.first_translation
-                WHERE id = %s AND {checksum_column} = %s
+                SELECT COUNT(*) FROM HighTimes.translations
+                WHERE text_id = %s AND checksum = %s
             """
             cursor.execute(select_statement, (translated_data["id"], checksum))
             result = cursor.fetchone()
@@ -130,31 +109,59 @@ def handler(event, context):
             if result and result[0] > 0:
                 return {
                     "statusCode": 200,
+                    "headers": {
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Methods": "GET,OPTIONS",
+                    },
                     "body": "Article translation already exists.",
                     "isBase64Encoded": "false",
                 }
 
             # Create an INSERT statement
             insert_statement = f"""
-                INSERT INTO first_translation (id, {title_column}, {text_column}, {checksum_column}, status)
-                VALUES (%s, %s, %s, %s, 'pending')
+                INSERT INTO translations (text_id, providers_id, content, checksum)
+                VALUES (%s, %s, %s, %s, %s)
                 ON DUPLICATE KEY UPDATE
-                {title_column} = VALUES({title_column}),
-                {text_column} = VALUES({text_column}),
-                {checksum_column} = VALUES({checksum_column}),
-                status = 'pending';
+                title = VALUES(title),
+                content = VALUES(content),
+                providers_id = VALUES(providers_id)
+                checksum = VALUES(checksum);
             """
+            
+            if data.get("title"):
+                loaded = {"title": data.get("title"), "text": data.get("text")}
+            else:
+                loaded = {"text": data.get("text")}
+
+            json_data = json.dumps(loaded)
 
             try:
                 # Execute the INSERT statement with the data
                 cursor.execute(
                     insert_statement,
-                    (data.get("id"), data.get("title"), data.get("text"), checksum),
+                    (data.get("id"), json_data, data.get("providers_id"), checksum),
                 )
             except Exception as e:
                 return {
                     "[ERROR]": f"{e} : {event.get('id')} : {translated_data.get('id')}"
                 }
+
+            insert_update_statement = f"""
+                UPDATE HighTimes
+                SET status = 'pending'
+                WHERE id = %s;
+            """
+            try:
+                cursor.execute(
+                        insert_update_statement, 
+                        (data.get("id"))
+                               )
+            except Exception as e:
+                return db.log_err(
+                    "[ERROR]: Cannot execute update statement.\n{}".format(
+                        traceback.format_exc()
+                    )
+                )
 
         except Exception as e:
             return db.log_err(
@@ -165,7 +172,10 @@ def handler(event, context):
 
         return {
             "body": "Data inserted successfully",
-            "headers": {},
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET,OPTIONS",
+            },
             "statusCode": 200,
             "isBase64Encoded": "false",
         }

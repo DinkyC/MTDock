@@ -32,11 +32,18 @@
 					</div>
 				</div>
 				<div class="row mt-4">
+                        <input type="hidden" id="translateTo" value="">
+                        <select id="dropdown">
+                            <option value="es" id="Spanish">Spanish</option>
+                            <option value="ja" id="Japanese">Japanese</option>
+                            <option value="pt" id="Portuguese">Portuguese</option>
+                        </select>
 					<div class="col text-end">
-						<button class="btn" style="border-radius: 30px; background-color: #FFFFFF; border: 1px solid #E2E8F0; color: #1B2559;padding:15px 25px;">
+						<button class="btn" id="regenerate" type="button" style="border-radius: 30px; background-color: #FFFFFF; border: 1px solid #E2E8F0; color: #1B2559;padding:15px 25px;">
 							<i class="fas fa-sync-alt mr-2"></i>
 							Regenerate Translation
 						</button>
+                        <div id="spinner" style="display: none;"></div>
 					</div>
 				</div>
 				<div class="row mt-4">
@@ -45,6 +52,15 @@
                             <textarea autosize spellcheck="false" class="form-control custom-textarea" id="baseTranslation" name="finalTranslation" style="resize: both;"></textarea>
 					</div>
 				</div>
+                <div class="row mt-4">
+                    <div class="col">
+                        <!-- Button for downloading the document -->
+                        <button class="btn" type="button" onclick="downloadWordDoc()" style="border-radius: 30px; background-color: #FFFFFF; border: 1px solid #E2E8F0; color: #1B2559;">
+                            <i class="fas fa-download mr-2"></i> <!-- Font Awesome download icon -->
+                            Download Word Doc
+                        </button>
+                    </div>
+                </div>
 				<div class="row mt-4">
 					<div class="col-md-4">
 						<h2 class="section-title">AWS</h2>
@@ -183,4 +199,23 @@
                         }, 5000);  // 5 seconds 
                     });
                 </script>
+                <script>
+                    const downloadWordDoc = () => {
+                        const contentBlock = document.getElementById("baseTranslation");
+                        const content = contentBlock.value; // Use .value to get the text content
+
+                        // Create a Blob with content and specify the MIME type for a Word document
+                        const file = new Blob([content], { type: 'application/msword' });
+
+                        // Create an anchor element to trigger the download
+                        const link = document.createElement("a");
+                        link.href = URL.createObjectURL(file);
+                        link.download = "document.doc"; // Specify the desired file name
+                        link.click();
+
+                        // Clean up resources
+                        URL.revokeObjectURL(link.href);
+                    };
+                </script>
+
             {% endblock %}

@@ -20,20 +20,23 @@ function fetchTranslation(index, dir) {
 
 
 window.onload = function() {
-    // Event listeners for the buttons
-    document.querySelectorAll('.custom-button').forEach(function(button) {
-        if (button.textContent.includes("Next Translation")) {
-            button.addEventListener('click', function() {
-                fetchTranslation(currentIndex, 'next');
-            });
-        } else if (button.textContent.includes("Previous Translation")) {
-            button.addEventListener('click', function() {
-                fetchTranslation(currentIndex, 'prev');
-            });
-        }
-    });
+    // Retrieve buttons by their IDs
+    const nextButton = document.getElementById('next-button');
+    const prevButton = document.getElementById('prev-button');
 
-    // Initial fetch when the window loads
+    // Event listeners for the buttons
+    if (nextButton) {
+        nextButton.addEventListener('click', function() {
+            fetchTranslation(currentIndex, 'next');
+        });
+    }
+    
+    if (prevButton) {
+        prevButton.addEventListener('click', function() {
+            fetchTranslation(currentIndex, 'prev');
+        });
+    }
+
     fetchTranslation(currentIndex, 'next');
 };
 

@@ -122,7 +122,6 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(80), nullable=False)
 
 
-
 class LoginForm(FlaskForm):
     username = StringField(validators=[
                            InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
