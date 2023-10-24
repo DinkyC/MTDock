@@ -27,5 +27,5 @@
 **/env/
 **/dependencies/
 **.pem
-**/certs/
+**/**/certs/
 
