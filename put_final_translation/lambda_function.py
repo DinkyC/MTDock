@@ -107,7 +107,7 @@ def handler(event, context):
             result = cursor.fetchone()
 
             # If a row with the same id and checksum is found, it means the article already exists
-            if result and result[0] > 0:
+            if result and result[0] > 0 and data.get("resubmit"):
                 return {
                     "statusCode": 200,
                     "body": "Article already exists.",
@@ -121,7 +121,7 @@ def handler(event, context):
             insert_or_update_statement = """
             INSERT INTO edited_translations 
             (text_id, edited_content, checksum) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s)
             ON DUPLICATE KEY UPDATE 
             text_id = VALUES(text_id),
             edited_content = VALUES(edited_content),
@@ -148,7 +148,7 @@ def handler(event, context):
 
                 # Update status in first_translation table after successful insert
                 update_status_statement = """
-                UPDATE first_translation
+                UPDATE HighTimes
                 SET status = 'done'
                 WHERE id = %s;
                 """
@@ -176,7 +176,8 @@ def handler(event, context):
                 WHERE text_id = %s AND providers_id IN (%s, %s, %s);
                 """
                 
-                result = cursor.execute(select_statement_id, (data.get('id'), AWS_PROVIDERS_ID, AZURE_PROVIDERS_ID, GCP_PROVIDERS_ID))
+                cursor.execute(select_statement_id, (data.get('id'), AWS_PROVIDERS_ID, AZURE_PROVIDERS_ID, GCP_PROVIDERS_ID))
+                result = cursor.fetchall()
 
                 aws_translation_id = result[0]
                 gcp_translation_id = result[1]
@@ -256,46 +257,46 @@ def handler(event, context):
         except:
             pass
 
-
-if __name__ == "__main__":
-    data = {"id": 100, "text": "\r\nSACRAMENTO, California (AP) \u2014 Los legisladores de California contaron una legislaci\u00f3n de gran alcance pero menos ambiciosa sobre el cambio clim\u00e1tico, una regulaci\u00f3n estatal de la marihuana medicinal y una medida profundamente emotiva para permitir la ayuda para morir entre los cientos de proyectos de ley que aprobaron antes de cerrar la sesi\u00f3n legislativa de 2015. temprano el s\u00e1bado. A principios de 20 a\u00f1os despu\u00e9s de que los votantes de California aprobaran el uso de marihuana con fines medicinales, los legisladores finalmente acordaron un paquete de proyectos de ley para crear las primeras reglas de operaci\u00f3n y licencias a nivel estatal para los productores de marihuana y los puntos de venta minorista de marihuana. Lo hicieron ante una probable iniciativa electoral del pr\u00f3ximo a\u00f1o para legalizar la marihuana recreativa. El marco busca gestionar la marihuana medicinal desde la semilla hasta el humo, exigiendo 17 categor\u00edas de licencia separadas, requisitos de etiquetado detallados y un sistema de seguimiento del producto completo con c\u00f3digos de barras y manifiestos de env\u00edo. \u201cCalifornia se ha quedado atr\u00e1s del resto de la naci\u00f3n y no logr\u00f3 garantizar una estructura regulatoria integral\u201d, dijo el asamble\u00edsta Reggie Jones-Sawyer, dem\u00f3crata por Los \u00c1ngeles. \"Esta industria es el salvaje oeste y debemos tomar medidas para abordarlo\". Si se promulga tal como est\u00e1 redactada, la legislaci\u00f3n impondr\u00eda controles estrictos a una industria que nunca ha tenido que cumplir con ninguno y proporcionar\u00eda un modelo de c\u00f3mo se podr\u00eda tratar la marihuana recreativa si se legaliza. La administraci\u00f3n Brown ayud\u00f3 a elaborar el paquete y se esperaba que \u00e9l lo firmara.", "comments": "12", "aws_rating": 4, "gcp_rating": 4, "azure_rating": 2, "checksum": "cb2baeee9bfbd4d19844efbeb484a443a908f3a987353de2f277aacdea77b43d"}
-    loaded = json.dumps(data)
-    event = {
-      "resource": "/your/resource/path",
-      "path": "/your/resource/path",
-      "httpMethod": "POST",
-      "headers": {
-        "Accept": "*/*",
-        "Content-Type": "application/json",
-        "Host": "your-api-id.execute-api.your-region.amazonaws.com",
-        "User-Agent": "curl/7.53.1"
-      },
-      "multiValueHeaders": {
-        "Accept": ["*/*"],
-        "Content-Type": ["application/json"]
-      },
-      "queryStringParameters": {
-        "param1": "value1",
-        "param2": "value2"
-      },
-      "multiValueQueryStringParameters": {
-        "param1": ["value1"],
-        "param2": ["value2", "value2B"]
-      },
-      "pathParameters": {
-        "pathParam1": "value1"
-      },
-      "stageVariables": {
-        "stageVarName": "stageVarValue"
-      },
-      "requestContext": {
-        "requestId": "request-id",
-        "path": "/your/resource/path",
-        "httpMethod": "POST",
-        "stage": "prod"
-      },
-      "body": loaded,
-      "isBase64Encoded": "false"
-    }
-
-    handler(event, None)
+#
+# if __name__ == "__main__":
+#     data = {"text": "hello", "id": 5, "aws_rating": 2, "gcp_rating": 3, "azure_rating": 4, "comments": "", "checksum": "49ada0c9015d01690a9494975260fa2ceebc02f9c3ca23fc1baab9a52eb3b2d6"}
+#     load = json.dumps(data)
+#     event = {
+#       "resource": "/your/resource/path",
+#       "path": "/your/resource/path",
+#       "httpMethod": "POST",
+#       "headers": {
+#         "Accept": "*/*",
+#         "Content-Type": "application/json",
+#         "Host": "your-api-id.execute-api.your-region.amazonaws.com",
+#         "User-Agent": "curl/7.53.1"
+#       },
+#       "multiValueHeaders": {
+#         "Accept": ["*/*"],
+#         "Content-Type": ["application/json"]
+#       },
+#       "queryStringParameters": {
+#         "param1": "value1",
+#         "param2": "value2"
+#       },
+#       "multiValueQueryStringParameters": {
+#         "param1": ["value1"],
+#         "param2": ["value2", "value2B"]
+#       },
+#       "pathParameters": {
+#         "pathParam1": "value1"
+#       },
+#       "stageVariables": {
+#         "stageVarName": "stageVarValue"
+#       },
+#       "requestContext": {
+#         "requestId": "request-id",
+#         "path": "/your/resource/path",
+#         "httpMethod": "POST",
+#         "stage": "prod"
+#       },
+#       "body": load,
+#       "isBase64Encoded": "false"
+#     }
+#
+#     handler(event, None)
