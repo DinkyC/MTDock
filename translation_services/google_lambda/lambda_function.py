@@ -84,11 +84,6 @@ class GCPTranslation:
 class AWSClient:
     def __init__(self):
         self.headers = {"Content-Type": "application/json"}
-        self.params = {
-            "checksum_column": "gcp_checksum",
-            "title_column": "gcp_title",
-            "text_column": "gcp_text",
-        }
         self.params_keys = ["put_first", "project_id", "bucket_name"]
         self.ssm = boto3.client("ssm")
         self.s3 = boto3.client("s3")
@@ -114,7 +109,7 @@ class AWSClient:
     def insert_translation(self, endpoint, translate_text):
         try:
             response = requests.post(
-                endpoint, json=translate_text, headers=self.headers, params=self.params
+                endpoint, json=translate_text, headers=self.headers
             )
             if response.status_code == 200:
                 return response.status_code
@@ -124,6 +119,17 @@ class AWSClient:
     def compute_checksum(self, data):
         return hashlib.sha256(str(data).encode("utf-8")).digest()
 
+    def log_err(self, errmsg):
+        logger.error(errmsg)
+        return {
+            "body": errmsg,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET,OPTIONS",
+            },
+            "statusCode": 400,
+            "isBase64Encoded": "false",
+        }
 
 def lambda_handler(event, context):
     aws = AWSClient()
@@ -133,6 +139,8 @@ def lambda_handler(event, context):
     aws.download_creds_from_s3(params_dict.get("bucket_name"))
 
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/tmp/gcp_creds.json"
+    
+    PROVIDERS_ID = 2
 
     # from google.cloud import translate
     translator = GCPTranslation()
@@ -144,24 +152,47 @@ def lambda_handler(event, context):
         from_lang = parsed_message.get("from_lang")
         to_lang = parsed_message.get("to_lang")
 
-        translated_title = translator.translate(
-            parsed_message.get("title"),
-            from_lang,
-            to_lang,
-            params_dict.get("project_id"),
-        )
-        translated_text = translator.translate(
-            parsed_message.get("text"),
-            from_lang,
-            to_lang,
-            params_dict.get("project_id"),
-        )
+        has_title = "title" in parsed_message
+        translated_title = None
+
+        if has_title:
+            try:
+                translated_title = translator.translate(
+                    parsed_message.get("title"),
+                    from_lang,
+                    to_lang,
+                    params_dict.get("project_id"),
+                )
+            except Exception as e:
+                return aws.log_err(
+                    "[ERROR]: Cannot retrieve query data.\n{}".format(
+                        traceback.format_exc()
+                    )
+                )
+        try:
+            translated_text = translator.translate(
+                parsed_message.get("text"),
+                from_lang,
+                to_lang,
+                params_dict.get("project_id"),
+            )
+        except Exception as e:
+            return aws.log_err(
+                "[ERROR]: Cannot retrieve query data.\n{}".format(
+                    traceback.format_exc()
+                )
+            )
 
         translated_data = {
-            "title": translated_title,
             "text": translated_text,
             "id": parsed_message.get("id"),
+            "providers_id": PROVIDERS_ID,
+            "lang_to": parsed_message.get("to_lang"),
+            "lang_from": parsed_message.get("from_lang")
         }
+
+        if translated_title:
+            translated_data["title"] = translated_title
 
         checksum = aws.compute_checksum(translated_data)
         translated_data["checksum"] = checksum.hex()

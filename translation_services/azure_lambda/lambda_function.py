@@ -75,11 +75,6 @@ class TranslationHander:
 class AWSClient:
     def __init__(self):
         self.headers = {"Content-Type": "application/json"}
-        self.params = {
-            "checksum_column": "azure_checksum",
-            "title_column": "azure_title",
-            "text_column": "azure_text",
-        }
         self.params_keys = ["put_first", "azure_key", "azure_endpoint"]
         self.ssm = boto3.client("ssm")
 
@@ -97,7 +92,7 @@ class AWSClient:
     def insert_translation(self, endpoint, translate_text):
         try:
             response = requests.post(
-                endpoint, json=translate_text, headers=self.headers, params=self.params
+                endpoint, json=translate_text, headers=self.headers 
             )
             if response.status_code == 200:
                 return response.status_code
@@ -113,6 +108,8 @@ def lambda_handler(event, context):
     aws = AWSClient()
     params_dict = aws.get_parameters_from_store()
 
+    PROVIDERS_ID = 3
+
     for message in event.get("Records"):
         message_body = message.get("body")
         parsed_message = json.loads(message_body)
@@ -121,14 +118,20 @@ def lambda_handler(event, context):
         to_lang = parsed_message.get("to_lang")
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            future_title = executor.submit(
-                translator.translate,
-                params_dict.get("azure_endpoint"),
-                from_lang,
-                to_lang,
-                parsed_message.get("title"),
-                params_dict.get("azure_key"),
-            )
+
+            has_title = "title" in parsed_message
+
+            future_title = None
+            if has_title:
+                future_title = executor.submit(
+                    translator.translate,
+                    params_dict.get("azure_endpoint"),
+                    from_lang,
+                    to_lang,
+                    parsed_message.get("title"),
+                    params_dict.get("azure_key"),
+                )
+
             future_text = executor.submit(
                 translator.translate,
                 params_dict.get("azure_endpoint"),
@@ -138,15 +141,38 @@ def lambda_handler(event, context):
                 params_dict.get("azure_key"),
             )
 
-            # Capture translated results
-            translated_title = future_title.result()
-            translated_text = future_text.result()
+            translated_title = None
+            if has_title:
+                try:
+                    # Capture translated results
+                    translated_title = future_title.result()
+                except Exception as e:
+                    return aws.log_err(
+                        "[ERROR]: Cannot translate title data.\n{}".format(
+                            traceback.format_exc()
+                        )
+                    )
+
+            try:
+                translated_text = future_text.result()
+            except Exception as e:
+                return aws.log_err(
+                    "[ERROR]: Cannot translate text data.\n{}".format(
+                        traceback.format_exc()
+                    )
+                )
+
 
         translated_data = {
-            "title": translated_title,
             "text": translated_text,
             "id": parsed_message.get("id"),
+            "lang_to": parsed_message.get("to_lang"),
+            "lang_from": parsed_message.get("from_lang"),
+            "providers_id": PROVIDERS_ID
         }
+
+        if translated_title:
+            translated_data["title"] = translated_title
 
         checksum = aws.compute_checksum(translated_data)
         translated_data["checksum"] = checksum.hex()

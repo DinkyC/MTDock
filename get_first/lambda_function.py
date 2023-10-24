@@ -13,7 +13,7 @@ logger.setLevel(logging.INFO)
 class HTDatabase:
     def construct_query(self, **kwargs):
         base_query = """
-        SELECT status, translations.content, lang_to, lang_from, providers_id 
+        SELECT status, translations.content, lang_to, lang_from, providers_id, text_id 
         FROM translations 
         INNER JOIN HighTimes ON translations.text_id = HighTimes.id
         """
@@ -168,7 +168,7 @@ def lambda_handler(event, context):
         # If there's a result, process it
         if result:
             # Convert the tuple to a dictionary
-            entry = {"id": id, "status": result[0][0], "text": loaded, "lang_to": result[0][2], "lang_from": result[0][3], "providers_id": provider}
+            entry = {"id": result[0][5], "status": result[0][0], "text": loaded, "lang_to": result[0][2], "lang_from": result[0][3], "providers_id": provider}
         else:
             entry = {}
         return {

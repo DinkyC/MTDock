@@ -77,11 +77,6 @@ class TranslationHandler:
 class AWSClient:
     def __init__(self):
         self.headers = {"Content-Type": "application/json"}
-        self.params = {
-            "checksum_column": "aws_checksum",
-            "title_column": "aws_title",
-            "text_column": "aws_text",
-        }
         self.params_keys = ["put_first"]
         self.ssm = boto3.client("ssm")
 
@@ -99,7 +94,7 @@ class AWSClient:
     def insert_translation(self, endpoint, translate_text):
         try:
             response = requests.post(
-                endpoint, json=translate_text, headers=self.headers, params=self.params
+                endpoint, json=translate_text, headers=self.headers
             )
             if response.status_code == 200:
                 return response.status_code
@@ -109,13 +104,28 @@ class AWSClient:
     def compute_checksum(self, data):
         return hashlib.sha256(str(data).encode("utf-8")).digest()
 
+    def log_err(self, errmsg):
+        logger.error(errmsg)
+        return {
+            "body": errmsg,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET,OPTIONS",
+            },
+            "statusCode": 400,
+            "isBase64Encoded": "false",
+        }
 
 # Main Lambda Handler
 def lambda_handler(event, context):
     translator = TranslationHandler()
     aws = AWSClient()
+    
+    PROVIDERS_ID = 1
 
     params_dict = aws.get_parameters_from_store()
+    
+    translated_title = None
 
     for message in event.get("Records"):
         message_body = message.get("body")
@@ -123,24 +133,57 @@ def lambda_handler(event, context):
 
         to_lang = parsed_message.get("to_lang")
         from_lang = parsed_message.get("from_lang")
-
+        
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            future_title = executor.submit(
-                translator.translate, parsed_message.get("title"), from_lang, to_lang
-            )
+            # Check if 'title' key is present in the parsed_message
+            has_title = "title" in parsed_message
+
+            # Initiate asynchronous translation for title, if it exists
+            future_title = None
+            if has_title:
+                future_title = executor.submit(
+                    translator.translate, parsed_message["title"], from_lang, to_lang
+                )
+
+            # Initiate asynchronous translation for text
             future_text = executor.submit(
-                translator.translate, parsed_message.get("text"), from_lang, to_lang
+                translator.translate, parsed_message.get("text", ""), from_lang, to_lang
             )
 
             # Capture translated results
-            translated_title = future_title.result()
-            translated_text = future_text.result()
+            translated_title_result = None
+            if has_title:
+                try:
+                    translated_title_result = future_title.result()
+                except Exception as e:
+                    return aws.log_err(
+                        "[ERROR]: Cannot translate title data.\n{}".format(
+                            traceback.format_exc()
+                        )
+                    )
 
+            try:
+                translated_text_result = future_text.result()
+            except Exception as e:
+                return aws.log_err(
+                    "[ERROR]: Cannot translate text data.\n{}".format(
+                        traceback.format_exc()
+                    )
+                )
+
+        # Construct the translated data
         translated_data = {
-            "title": translated_title,
-            "text": translated_text,
+            "text": translated_text_result,
             "id": parsed_message.get("id"),
+            "lang_to": parsed_message.get("to_lang"),
+            "lang_from": parsed_message.get("from_lang"),
+            "providers_id": PROVIDERS_ID
         }
+        
+        # Add the translated title to the data if it was translated
+        if translated_title_result:
+            translated_data["title"] = translated_title_result
+
 
         checksum = aws.compute_checksum(translated_data)
         translated_data["checksum"] = checksum.hex()
