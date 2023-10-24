@@ -26,6 +26,5 @@
 *.zip
 **/env/
 **/dependencies/
-**.pem
-**/**/certs/
+*.pem
 
