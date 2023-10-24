@@ -147,7 +147,7 @@ def lambda_handler(event, context):
 
             # Initiate asynchronous translation for text
             future_text = executor.submit(
-                translator.translate, parsed_message.get("text", ""), from_lang, to_lang
+                translator.translate, parsed_message.get("text"), from_lang, to_lang
             )
 
             # Capture translated results

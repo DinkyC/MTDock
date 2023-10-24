@@ -78,7 +78,6 @@ def handler(event, context):
     try:
         # Extract the data you want to insert from the event or any other source
         translated_data = {
-            "title": data.get("title"),
             "text": data.get("text"),
             "id": data.get("id"),
         }
@@ -194,3 +193,5 @@ def handler(event, context):
             cnx.close()
         except:
             pass
+
+

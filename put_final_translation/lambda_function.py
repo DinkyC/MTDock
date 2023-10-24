@@ -78,7 +78,6 @@ def handler(event, context):
     try:
         # Extract the data you want to insert from the event or any other source
         translated_data = {
-            "title": data.get("title"),
             "text": data.get("text"),
             "id": data.get("id"),
         }
@@ -101,10 +100,10 @@ def handler(event, context):
         try:
             # Check if the article already exists based on id and checksum
             select_statement = """
-                SELECT COUNT(*) FROM HighTimes.translations
-                WHERE translation_id = %s AND checksum = %s
+                SELECT COUNT(*) FROM HighTimes.edited_translations
+                WHERE text_id = %s AND checksum = %s
             """
-            cursor.execute(select_statement, (data.get("translation_id"), checksum))
+            cursor.execute(select_statement, (data.get("id"), checksum))
             result = cursor.fetchone()
 
             # If a row with the same id and checksum is found, it means the article already exists
@@ -216,7 +215,7 @@ def handler(event, context):
                 INSERT INTO comments (text_id, comments)
                 VALUES (%s, %s)
                 ON DUPLICATE KEY UPDATE
-                    text_id=VALUES(text_id);
+                    text_id = VALUES(text_id);
                 """
                 cursor.execute(insert_comments, (data.get("id"), data.get("comments")))
 
@@ -258,45 +257,45 @@ def handler(event, context):
             pass
 
 
-# if __name__ == "__main__":
-#     data = {"id": 100, "title": "\u00daltima hora: los legisladores de California finalmente abordan la marihuana medicinal\r", "text": "\r\nSACRAMENTO, California (AP) \u2014 Los legisladores de California contaron una legislaci\u00f3n de gran alcance pero menos ambiciosa sobre el cambio clim\u00e1tico, una regulaci\u00f3n estatal de la marihuana medicinal y una medida profundamente emotiva para permitir la ayuda para morir entre los cientos de proyectos de ley que aprobaron antes de cerrar la sesi\u00f3n legislativa de 2015. temprano el s\u00e1bado. A principios de 20 a\u00f1os despu\u00e9s de que los votantes de California aprobaran el uso de marihuana con fines medicinales, los legisladores finalmente acordaron un paquete de proyectos de ley para crear las primeras reglas de operaci\u00f3n y licencias a nivel estatal para los productores de marihuana y los puntos de venta minorista de marihuana. Lo hicieron ante una probable iniciativa electoral del pr\u00f3ximo a\u00f1o para legalizar la marihuana recreativa. El marco busca gestionar la marihuana medicinal desde la semilla hasta el humo, exigiendo 17 categor\u00edas de licencia separadas, requisitos de etiquetado detallados y un sistema de seguimiento del producto completo con c\u00f3digos de barras y manifiestos de env\u00edo. \u201cCalifornia se ha quedado atr\u00e1s del resto de la naci\u00f3n y no logr\u00f3 garantizar una estructura regulatoria integral\u201d, dijo el asamble\u00edsta Reggie Jones-Sawyer, dem\u00f3crata por Los \u00c1ngeles. \"Esta industria es el salvaje oeste y debemos tomar medidas para abordarlo\". Si se promulga tal como est\u00e1 redactada, la legislaci\u00f3n impondr\u00eda controles estrictos a una industria que nunca ha tenido que cumplir con ninguno y proporcionar\u00eda un modelo de c\u00f3mo se podr\u00eda tratar la marihuana recreativa si se legaliza. La administraci\u00f3n Brown ayud\u00f3 a elaborar el paquete y se esperaba que \u00e9l lo firmara.", "comments": "12", "aws_rating": 4, "gcp_rating": 4, "azure_rating": 2, "checksum": "cb2baeee9bfbd4d19844efbeb484a443a908f3a987353de2f277aacdea77b43d"}
-#     loaded = json.dumps(data)
-#     event = {
-#       "resource": "/your/resource/path",
-#       "path": "/your/resource/path",
-#       "httpMethod": "POST",
-#       "headers": {
-#         "Accept": "*/*",
-#         "Content-Type": "application/json",
-#         "Host": "your-api-id.execute-api.your-region.amazonaws.com",
-#         "User-Agent": "curl/7.53.1"
-#       },
-#       "multiValueHeaders": {
-#         "Accept": ["*/*"],
-#         "Content-Type": ["application/json"]
-#       },
-#       "queryStringParameters": {
-#         "param1": "value1",
-#         "param2": "value2"
-#       },
-#       "multiValueQueryStringParameters": {
-#         "param1": ["value1"],
-#         "param2": ["value2", "value2B"]
-#       },
-#       "pathParameters": {
-#         "pathParam1": "value1"
-#       },
-#       "stageVariables": {
-#         "stageVarName": "stageVarValue"
-#       },
-#       "requestContext": {
-#         "requestId": "request-id",
-#         "path": "/your/resource/path",
-#         "httpMethod": "POST",
-#         "stage": "prod"
-#       },
-#       "body": loaded,
-#       "isBase64Encoded": "false"
-#     }
-#
-#     handler(event, None)
+if __name__ == "__main__":
+    data = {"id": 100, "text": "\r\nSACRAMENTO, California (AP) \u2014 Los legisladores de California contaron una legislaci\u00f3n de gran alcance pero menos ambiciosa sobre el cambio clim\u00e1tico, una regulaci\u00f3n estatal de la marihuana medicinal y una medida profundamente emotiva para permitir la ayuda para morir entre los cientos de proyectos de ley que aprobaron antes de cerrar la sesi\u00f3n legislativa de 2015. temprano el s\u00e1bado. A principios de 20 a\u00f1os despu\u00e9s de que los votantes de California aprobaran el uso de marihuana con fines medicinales, los legisladores finalmente acordaron un paquete de proyectos de ley para crear las primeras reglas de operaci\u00f3n y licencias a nivel estatal para los productores de marihuana y los puntos de venta minorista de marihuana. Lo hicieron ante una probable iniciativa electoral del pr\u00f3ximo a\u00f1o para legalizar la marihuana recreativa. El marco busca gestionar la marihuana medicinal desde la semilla hasta el humo, exigiendo 17 categor\u00edas de licencia separadas, requisitos de etiquetado detallados y un sistema de seguimiento del producto completo con c\u00f3digos de barras y manifiestos de env\u00edo. \u201cCalifornia se ha quedado atr\u00e1s del resto de la naci\u00f3n y no logr\u00f3 garantizar una estructura regulatoria integral\u201d, dijo el asamble\u00edsta Reggie Jones-Sawyer, dem\u00f3crata por Los \u00c1ngeles. \"Esta industria es el salvaje oeste y debemos tomar medidas para abordarlo\". Si se promulga tal como est\u00e1 redactada, la legislaci\u00f3n impondr\u00eda controles estrictos a una industria que nunca ha tenido que cumplir con ninguno y proporcionar\u00eda un modelo de c\u00f3mo se podr\u00eda tratar la marihuana recreativa si se legaliza. La administraci\u00f3n Brown ayud\u00f3 a elaborar el paquete y se esperaba que \u00e9l lo firmara.", "comments": "12", "aws_rating": 4, "gcp_rating": 4, "azure_rating": 2, "checksum": "cb2baeee9bfbd4d19844efbeb484a443a908f3a987353de2f277aacdea77b43d"}
+    loaded = json.dumps(data)
+    event = {
+      "resource": "/your/resource/path",
+      "path": "/your/resource/path",
+      "httpMethod": "POST",
+      "headers": {
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Host": "your-api-id.execute-api.your-region.amazonaws.com",
+        "User-Agent": "curl/7.53.1"
+      },
+      "multiValueHeaders": {
+        "Accept": ["*/*"],
+        "Content-Type": ["application/json"]
+      },
+      "queryStringParameters": {
+        "param1": "value1",
+        "param2": "value2"
+      },
+      "multiValueQueryStringParameters": {
+        "param1": ["value1"],
+        "param2": ["value2", "value2B"]
+      },
+      "pathParameters": {
+        "pathParam1": "value1"
+      },
+      "stageVariables": {
+        "stageVarName": "stageVarValue"
+      },
+      "requestContext": {
+        "requestId": "request-id",
+        "path": "/your/resource/path",
+        "httpMethod": "POST",
+        "stage": "prod"
+      },
+      "body": loaded,
+      "isBase64Encoded": "false"
+    }
+
+    handler(event, None)

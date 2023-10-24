@@ -3,7 +3,7 @@ import logging
 import traceback
 import os
 import json
-import pdb
+#import pdb
 import boto3
 
 logger = logging.getLogger()
