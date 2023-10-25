@@ -5,6 +5,7 @@ import os
 import json
 import concurrent.futures
 import logging
+import pdb
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -194,7 +195,7 @@ def lambda_handler(event, context):
         if translated_title:
             translated_data["title"] = translated_title
 
-        checksum = aws.compute_checksum(translated_data)
+        checksum = aws.compute_checksum({"text": translated_data["text"], "id": translated_data["id"]})
         translated_data["checksum"] = checksum.hex()
         # Sending translated data to RDS
         try:
@@ -218,6 +219,14 @@ def lambda_handler(event, context):
     }
 
 
-# if __name__ == "__main__":
-#     event={"from_lang": "en", "to_lang": "es"}
-#     lambda_handler(event, None)
+if __name__ == "__main__":
+    event = {
+    "Records": [
+        {
+            "body": "{\"id\": 421, \"text\": \"value\", \"title\": \"hello\", \"from_lang\": \"en\", \"to_lang\": \"ja\", \"checksum\": \"4f0a3bb934fb53af78ce74b588b49afd661f9e68b0ac65c5819dd7bdd9fb9bf8\"}"
+        }
+    ]
+}
+
+
+    lambda_handler(event, None)

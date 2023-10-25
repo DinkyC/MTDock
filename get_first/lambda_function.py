@@ -194,4 +194,31 @@ def lambda_handler(event, context):
         except:
             pass
 
-
+if __name__ == "__main__":
+    event = {
+        "resource": "/your/resource/path",
+        "path": "/your/resource/path",
+        "httpMethod": "POST",
+        "headers": {
+            "Accept": "*/*",
+            "Content-Type": "application/json",
+            "Host": "your-api-id.execute-api.your-region.amazonaws.com",
+            "User-Agent": "curl/7.53.1",
+        },
+        "multiValueHeaders": {"Accept": ["*/*"], "Content-Type": ["application/json"]},
+        "queryStringParameters": {"id": 2},
+        "multiValueQueryStringParameters": {
+            "param1": ["value1"],
+            "param2": ["value2", "value2B"],
+        },
+        "pathParameters": {"pathParam1": "value1"},
+        "stageVariables": {"stageVarName": "stageVarValue"},
+        "requestContext": {
+            "requestId": "request-id",
+            "path": "/your/resource/path",
+            "httpMethod": "POST",
+            "stage": "prod",
+        },
+        "isBase64Encoded": False,
+    }
+    lambda_handler(event, None)

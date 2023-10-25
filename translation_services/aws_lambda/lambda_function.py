@@ -7,7 +7,7 @@ import logging
 from botocore.exceptions import ClientError
 import hashlib
 import concurrent.futures
-import pdb
+#import pdb
 
 class TranslationHandler:
     def __init__(self):
@@ -185,7 +185,7 @@ def lambda_handler(event, context):
             translated_data["title"] = translated_title_result
 
 
-        checksum = aws.compute_checksum(translated_data)
+        checksum = aws.compute_checksum({"text": translated_data["text"], "id": translated_data["id"]})
         translated_data["checksum"] = checksum.hex()
         # Sending translated data to RDS
         try:
@@ -200,12 +200,12 @@ def lambda_handler(event, context):
     return {"status": "success", "message_count": len(event.get("Records"))}
 
 
-#
+
 # if __name__ == "__main__":
 #     event = {
 #     "Records": [
 #         {
-#             "body": "{\"id\": 421, \"text\": \"value\", \"title\": \"hello\", \"from_lang\": \"en\", \"to_lang\": \"ja\"}"
+#             "body": "{\"id\": 421, \"text\": \"value\", \"title\": \"hello\", \"from_lang\": \"en\", \"to_lang\": \"ja\", \"checksum\": \"4f0a3bb934fb53af78ce74b588b49afd661f9e68b0ac65c5819dd7bdd9fb9bf8\"}"
 #         }
 #     ]
 # }

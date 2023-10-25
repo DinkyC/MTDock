@@ -71,17 +71,18 @@ class HTDatabase:
 
 
 def handler(event, context):
-    body = json.loads(event["body"])
-    
+    body = event.get("body", "{}")
+    data = json.loads(body)
+
     db = HTDatabase()
     try:
         # Extract the data you want to insert from the event or any other source
         translated_data = {
-            "text": body.get("text"),
-            "id": body.get("id"),
+            "text": data.get("text"),
+            "id": data.get("id"),
         }
         checksum = db.compute_checksum(translated_data)
-        if body.get("checksum") != checksum.hex():
+        if data.get("checksum") != checksum.hex():
             return {
                 "statusCode": 500,
                 "headers": {
@@ -128,10 +129,10 @@ def handler(event, context):
                 checksum = VALUES(checksum);
             """
             
-            if body.get("title"):
-                loaded = {"title": body.get("title"), "text": body.get("text")}
+            if data.get("title"):
+                loaded = {"title": data.get("title"), "text": data.get("text")}
             else:
-                loaded = {"text": body.get("text")}
+                loaded = {"text": data.get("text")}
 
             json_data = json.dumps(loaded)
 
@@ -139,7 +140,7 @@ def handler(event, context):
                 # Execute the INSERT statement with the data
                 cursor.execute(
                     insert_statement,
-                    (body.get("id"), json_data, body.get("providers_id"), body.get("lang_to"), body.get("lang_from"), checksum.hex()),
+                    (data.get("id"), json_data, data.get("providers_id"), data.get("lang_to"), data.get("lang_from"), checksum),
                 )
             except Exception as e:
                 return {
@@ -154,7 +155,7 @@ def handler(event, context):
             try:
                 cursor.execute(
                         insert_update_statement, 
-                        (body.get("id"))
+                        (data.get("id"))
                                )
             except Exception as e:
                 return db.log_err(

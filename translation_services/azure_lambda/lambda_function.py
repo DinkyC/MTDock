@@ -174,7 +174,7 @@ def lambda_handler(event, context):
         if translated_title:
             translated_data["title"] = translated_title
 
-        checksum = aws.compute_checksum(translated_data)
+        checksum = aws.compute_checksum({"text": translated_data["text"], "id": translated_data["id"]})
         translated_data["checksum"] = checksum.hex()
         # Sending translated data to RDS
         try:

@@ -135,16 +135,24 @@ def handler(event, context):
                     loaded = {"text": data.get("text")}
 
                 json_data = json.dumps(loaded)
-
-                # Execute the INSERT statement with the data
-                cursor.execute(
-                    insert_or_update_statement,
-                    (
-                        data.get("id"),
-                        json_data,
-                        checksum,
-                    ),
+                
+                try:
+                    # Execute the INSERT statement with the data
+                    cursor.execute(
+                        insert_or_update_statement,
+                        (
+                            data.get("id"),
+                            json_data,
+                            checksum.hex(),
+                        ),
+                    )
+                except Exception as e:
+                    return db.log_err(
+                        "ERROR: Cannot execute INSERT statement for edited_translations.\n{}".format(
+                        traceback.format_exc()
+                    )
                 )
+ 
 
                 # Update status in first_translation table after successful insert
                 update_status_statement = """
@@ -152,7 +160,15 @@ def handler(event, context):
                 SET status = 'done'
                 WHERE id = %s;
                 """
-                cursor.execute(update_status_statement, (data.get("id"),))
+
+                try:
+                    cursor.execute(update_status_statement, (data.get("id"),))
+                except Exception as e:
+                    return db.log_err(
+                        "ERROR: Cannot execute UPDATE on status.\n{}".format(
+                        traceback.format_exc()
+                    )
+                )
 
             except Exception as e:
                 return {
