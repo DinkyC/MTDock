@@ -146,14 +146,14 @@ def lambda_handler(event, context):
                     traceback.format_exc()
                 )
             )
-
+        if cursor.rowcount == 0:
+            return db.log_err("[ERROR] no result for given id or title")
         loaded = json.loads(result[0][1])
         # If there's a result, process it
         if result:
             # Convert the tuple to a dictionary
             entry = {"id": result[0][0], "text": loaded}
-        else:
-            entry = {}
+
         return {
             "body": json.dumps(entry),  # Serialize list to JSON
             "headers": {
