@@ -15,12 +15,12 @@
 !Translator_Dashboard/**/**/*
 !translation_services/
 !translation_services/**/*
-!extra_code/
-!extra_code/**/*
 !get_first/
 !get_first/*
 !get_final/
 !get_final/*
+!get_status/
+!get_status/*
 
 # Ignore zip files and env directories everywhere
 *.zip
