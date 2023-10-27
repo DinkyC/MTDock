@@ -21,7 +21,7 @@
 !get_final/*
 !get_status/
 !get_status/*
-
+!README.md
 # Ignore zip files and env directories everywhere
 *.zip
 **/env/
