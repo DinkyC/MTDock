@@ -20,18 +20,22 @@ class HTDatabase:
         params = []
 
         if kwargs.get("title"):
-            conditions.append("JSON_EXTRACT(translations.text, '$.title') = %s")
+            conditions.append("JSON_EXTRACT(edited_translations.edited_content, '$.title') = %s")
             params.append(kwargs["title"])
 
         # Adjust the id condition based on direction
         if kwargs.get("id"):
             if kwargs.get("direction") == "next":
-                conditions.append("translations.text_id > %s")
+                conditions.append("edited_translations.text_id > %s")
             elif kwargs.get("direction") == "prev":
-                conditions.append("translations.text_id < %s")
+                conditions.append("edited_translations.text_id < %s")
             else:
-                conditions.append("translations.text_id = %s")
+                conditions.append("edited_translations.text_id = %s")
             params.append(kwargs["id"])
+
+        if kwargs.get("providers_id"):
+            conditions.append("translations.providers_id = %s")
+            params.append(kwargs["providers_id"])
 
         if conditions:
             base_query += " WHERE " + " AND ".join(conditions)
@@ -108,13 +112,16 @@ def lambda_handler(event, context):
     id = queryStringParameters.get("id")
     title = queryStringParameters.get("title")
 
+    providers_id = queryStringParameters.get("providers_id") 
+    direction = queryStringParameters.get("direction")
+
     if not id:
         logger.info("No id provided.")
     if not title:
         logger.info("No title provided.")
 
     try:
-        query, params = db.construct_query(title=title, id=id)
+        query, params = db.construct_query(title=title, id=id, direction=direction, providers_id=providers_id)
     except Exception as e:
         logger.error(f"[ERROR]: Cannot construct query. {e}")
         return {
@@ -146,8 +153,10 @@ def lambda_handler(event, context):
                     traceback.format_exc()
                 )
             )
+
         if cursor.rowcount == 0:
             return db.log_err("[ERROR] no result for given id or title")
+
         loaded = json.loads(result[0][1])
         # If there's a result, process it
         if result:

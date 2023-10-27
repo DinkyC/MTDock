@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+{% extends "base.html" %}
+
+{% block content %}
+
+    <title>DataTables Integration</title>
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+
+    <!-- jQuery (necessary for DataTables) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#data-table').DataTable({
+                "ajax": {
+                    "url": "/get_status",
+                    "dataSrc": ""
+                },
+                "columns": [
+                    { "data": "status" },
+                    { "data": "title" },
+                    { "data": "lang_to" },
+                    { "data": "lang_from" }
+                ]
+            });
+        });
+    </script>
+
+<table id="data-table" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th>Status</th>
+            <th>Title</th>
+            <th>Lang To</th>
+            <th>Lang From</th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th>Status</th>
+            <th>Title</th>
+            <th>Lang To</th>
+            <th>Lang From</th>
+        </tr>
+    </tfoot>
+</table>
+
+{% endblock %}
+

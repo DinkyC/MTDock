@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect, flash, request
+from flask import Flask, render_template, url_for, redirect, flash, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -12,6 +12,7 @@ import boto3
 import json
 import hashlib
 import requests
+import pandas as pd
 pymysql.install_as_MySQLdb()
 
 
@@ -20,7 +21,7 @@ pymysql.install_as_MySQLdb()
 class AWSClient:
     def __init__(self):
         self.ssm = boto3.client("ssm")
-        self.params_keys = ["put_final"]
+        self.params_keys = ["put_final", "get_status"]
 
     def get_database_credentials(self):
         secret = self.get_secret()
@@ -199,7 +200,6 @@ def submit_translations():
             }
     
     check = {
-        "title": title,
         "text": text,
         "id": int(id)
             }
@@ -217,6 +217,26 @@ def submit_translations():
         flash(f'Incorrect submission. Please check submission fields. Error: {e}', 'danger')
 
     return redirect(url_for('dashboard'))  
+    
+
+@app.route('/get_status', methods=['GET', 'POST'])
+@login_required
+def status():
+    aws = AWSClient()
+    params_dict = aws.get_parameters_from_store()
+
+    response = requests.get(params_dict["get_status"], headers={'Content-Type': 'application/json'})
+    
+    data = response.json()
+    df = pd.DataFrame(data)
+
+
+    return jsonify(df.to_dict(orient='records'))
+
+@app.route('/status', methods=['GET', 'POST'])
+@login_required
+def status_page():
+    return render_template("status.html")
 
 
 

@@ -4,31 +4,54 @@ let currentIndex = 1;
 function getProviderColumns(provider) {
     switch (provider) {
         case 'aws':
-            return ['aws_title', 'aws_text', 'aws_checksum', 'first_translation'];
+            return 1;
         case 'gcp':
-            return ['gcp_title', 'gcp_text', 'gcp_checksum', 'first_translation'];
+            return 2;
         case 'azure':
-            return ['azure_title', 'azure_text', 'azure_checksum', 'first_translation'];
+            return 3;
         default:
             return [];
     }
 }
 
 function fetchTranslationForService(service) {
-    let columns = getProviderColumns(service);
-    const [titleColumn, textColumn, checksumColumn, table] = columns;
+    let providers_id = getProviderColumns(service);
+    let fetchUrl = (currentIndex == 1) 
+        ? `${CONFIG.API_ENDPOINT}/get-first?providers_id=${providers_id}&direction=next&id=0`
+        : `${CONFIG.API_ENDPOINT}/get-first?providers_id=${providers_id}&direction=next&id=${currentIndex}`;
 
-    return fetch(`${CONFIG.API_ENDPOINT}/get-translation?title_column=${titleColumn}&text_column=${textColumn}&checksum_column=${checksumColumn}&table=${table}&direction=next&id=${currentIndex}`)
-        .then(response => response.json());
+    return fetch(fetchUrl)
+        .then(response => {
+
+            return response.json();
+        });
 }
 
 function fetchTranslationForServicePrev(service) {
-    let columns = getProviderColumns(service);
-    const [titleColumn, textColumn, checksumColumn, table] = columns;
+    let providers_id = getProviderColumns(service);
+    let fetchUrl = (currentIndex == 1) 
+        ? `${CONFIG.API_ENDPOINT}/get-first?providers_id=${providers_id}&direction=prev&id=0`
+        : `${CONFIG.API_ENDPOINT}/get-first?providers_id=${providers_id}&direction=prev&id=${currentIndex}`;
 
-    return fetch(`${CONFIG.API_ENDPOINT}/get-translation?title_column=${titleColumn}&text_column=${textColumn}&checksum_column=${checksumColumn}&table=${table}&direction=prev&id=${currentIndex}`)
-        .then(response => response.json());
-   
+    return fetch(fetchUrl)
+        .then(response => {
+            if (!response.ok && response.status === 400) {
+                showFlashMessage("No more articles");
+            }
+            return response.json();
+        });
+}
+
+function showFlashMessage(message) {
+    // Create and display flash message
+    var flashMessage = document.createElement('div');
+    flashMessage.className = 'flash-message';
+    flashMessage.textContent = message;
+    document.body.appendChild(flashMessage);
+    
+    setTimeout(function() {
+        flashMessage.parentNode.removeChild(flashMessage);
+    }, 4000);
 }
 
 
@@ -49,7 +72,7 @@ function updateTranslationElements() {
         .then(data => {
             if (Object.keys(data).length !== 0) {
                 const awsTextarea = document.getElementById('awsTranslation');
-                if (awsTextarea) awsTextarea.value = data.title + "\n\n" + data.text;
+                if (awsTextarea) awsTextarea.value = data.text.title + "\n\n" + data.text.text;
             }
             return data;
         }));
@@ -59,7 +82,7 @@ function updateTranslationElements() {
         .then(data => {
             if (Object.keys(data).length !== 0) {
                 const gcpTextarea = document.getElementById('googleTranslation');
-                if (gcpTextarea) gcpTextarea.value = data.title + "\n\n" + data.text;
+                if (gcpTextarea) gcpTextarea.value = data.text.title + "\n\n" + data.text.text;
             }
             return data;
         }));
@@ -69,19 +92,22 @@ function updateTranslationElements() {
         .then(data => {
             if (Object.keys(data).length !== 0) {
                 const azureTextarea = document.getElementById('azureTranslation');
-                if (azureTextarea) azureTextarea.value = data.title + "\n\n" + data.text;
+                if (azureTextarea) azureTextarea.value = data.text.title + "\n\n" + data.text.text;
             }
             return data;
         }));
-
+    const initialIndex = currentIndex;
     // When all translations have been fetched
     Promise.all(promises).then(results => {
         let nonEmptyResult = results.find(data => Object.keys(data).length !== 0);
     
         if (nonEmptyResult) {
             currentIndex = nonEmptyResult.id;
-            updateCurrentIndexInput();
             fetchOriginalArticle(currentIndex);
+            updateCurrentIndexInput();
+        }
+        if (initialIndex === currentIndex) {
+            showFlashMessage("No more articles");
         }
     });
 }
@@ -94,7 +120,7 @@ function updateTranslationElementsPrev() {
         .then(data => {
             if (Object.keys(data).length !== 0) {
                 const awsTextarea = document.getElementById('awsTranslation');
-                if (awsTextarea) awsTextarea.value = data.title + "\n\n" + data.text;
+                if (awsTextarea) awsTextarea.value = data.text.title + "\n\n" + data.text.text;
             }
             return data;
         }));
@@ -104,7 +130,7 @@ function updateTranslationElementsPrev() {
         .then(data => {
             if (Object.keys(data).length !== 0) {
                 const gcpTextarea = document.getElementById('googleTranslation');
-                if (gcpTextarea) gcpTextarea.value = data.title + "\n\n" + data.text;
+                if (gcpTextarea) gcpTextarea.value = data.text.title + "\n\n" + data.text.text;
             }
             return data;
         }));
@@ -114,20 +140,20 @@ function updateTranslationElementsPrev() {
         .then(data => {
             if (Object.keys(data).length !== 0) {
                 const azureTextarea = document.getElementById('azureTranslation');
-                if (azureTextarea) azureTextarea.value = data.title + "\n\n" + data.text;
+                if (azureTextarea) azureTextarea.value = data.text.title + "\n\n" + data.text.text;
             }
             return data;
         }));
-
     // When all translations have been fetched
     Promise.all(promises).then(results => {
         let nonEmptyResult = results.find(data => Object.keys(data).length !== 0);
     
         if (nonEmptyResult) {
             currentIndex = nonEmptyResult.id;
-            updateCurrentIndexInput();
             fetchOriginalArticle(currentIndex);
+            updateCurrentIndexInput();
         }
+
     });
 }
 
@@ -149,8 +175,6 @@ function regenerateTranslation() {
         // Show spinner
         document.getElementById('spinner').style.display = 'block';
 
-        // Introduce a delay of 10 seconds
-        setTimeout(() => {
             fetch(`${CONFIG.API_ENDPOINT}/push-to-fifo?id=${currentIndex}&from_lang=en&to_lang=${lang}`, {
                 method: 'POST',
                 headers: {
@@ -165,18 +189,49 @@ function regenerateTranslation() {
                 return response.text();
             })
             .then(data => {
-                updateTranslationElements();
-                // Hide spinner
-                document.getElementById('spinner').style.display = 'none';
+                setTimeout(() => {
+
+                    updateTranslationElements();
+                    document.getElementById('spinner').style.display = 'none';
+                }, 5500); // set 15 second delay
             })
             .catch(error => {
                 console.error("There was a problem with the fetch operation:", error.message);
                 // Hide spinner
                 document.getElementById('spinner').style.display = 'none';
             });
-        }, 10000); // 10 seconds delay
     }
 }
+
+function setRating(platform, ratingValue) {
+    let ratingElementId;
+    let inputElementId;
+
+    if (platform === 'GCP') {
+        ratingElementId = 'GCP_rating';
+        inputElementId = 'GCPRatingInput';
+    } else if (platform === 'Azure') {
+        ratingElementId = 'Azure_rating';  // Ensure this ID matches the one in your HTML
+        inputElementId = 'AzureRatingInput';
+    } else if (platform === 'AWS') {
+        ratingElementId = 'AWS_rating';  // If you have an element for AWS, set its ID here
+        inputElementId = 'AWSRatingInput';
+    }
+
+    // Set the value to the appropriate input
+    document.getElementById(inputElementId).value = ratingValue;
+
+    // Update the visual representation of stars
+    const stars = document.querySelectorAll(`#${ratingElementId} span`);
+    stars.forEach((star, index) => {
+        if (index < ratingValue) {
+            star.classList.add('active');
+        } else {
+            star.classList.remove('active');
+        }
+    });
+}
+
 
 document.addEventListener('DOMContentLoaded', function() {
     const regenButton = document.getElementById('regenerate');

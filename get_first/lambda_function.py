@@ -21,7 +21,7 @@ class HTDatabase:
         params = []
 
         if kwargs.get("title"):
-            conditions.append("JSON_EXTRACT(translations.text, '$.title') = %s")
+            conditions.append("JSON_EXTRACT(translations.content, '$.title') = %s")
             params.append(kwargs["title"])
 
         # Adjust the id condition based on direction
@@ -33,6 +33,11 @@ class HTDatabase:
             else:
                 conditions.append("translations.text_id = %s")
             params.append(kwargs["id"])
+
+        if kwargs.get("providers_id"):
+            conditions.append("translations.providers_id = %s")
+            params.append(kwargs["providers_id"])
+
 
         if conditions:
             base_query += " WHERE " + " AND ".join(conditions)
@@ -107,6 +112,9 @@ def lambda_handler(event, context):
     # Extract values or set to None if not provided
     id = queryStringParameters.get("id")
     title = queryStringParameters.get("title")
+    providers_id = queryStringParameters.get("providers_id")
+
+    direction = queryStringParameters.get("direction")
 
     if not id:
         logger.info("No id provided.")
@@ -114,7 +122,7 @@ def lambda_handler(event, context):
         logger.info("No title provided.")
 
     try:
-        query, params = db.construct_query(title=title, id=id)
+        query, params = db.construct_query(title=title, id=id, direction=direction, providers_id=providers_id)
     except Exception as e:
         logger.error(f"[ERROR]: Cannot construct query. {e}")
         return {
