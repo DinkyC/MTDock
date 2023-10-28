@@ -148,21 +148,52 @@ def handler(event, context):
                     traceback.format_exc()
                 )
             )
+
+        entries = []
+
         # If there's a result, process it
         if result:
-            # Convert the tuple to a dictionary
-            entry = {"id": result[0][0], "title": result[0][1], "text": result[0][2]}
+            if len(result) == 1:
+                # If there's only one result, return it as a dictionary
+                entry = {"id": result[0][0], "title": result[0][1], "text": result[0][2]}
+                return {
+                    "body": json.dumps(entry),  # Serialize dictionary to JSON
+                    "headers": {
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Methods": "GET,OPTIONS",
+                    },
+                    "statusCode": 200,
+                    "isBase64Encoded": False,  # Boolean value, not a string
+                }
+            else:
+                # If there are multiple results, process them as a list of dictionaries
+                for row in result:
+                    entry = {"id": row[0], "title": row[1], "text": row[2]}
+                    entries.append(entry)
         else:
+            # Handle the case when there are no results
             entry = {}
+            return {
+                "body": json.dumps(entry),  # Serialize dictionary to JSON
+                "headers": {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "GET,OPTIONS",
+                },
+                "statusCode": 200,
+                "isBase64Encoded": False,  # Boolean value, not a string
+            }
+
+        # If there are multiple results, return them as a list of dictionaries
         return {
-            "body": json.dumps(entry),  # Serialize list to JSON
+            "body": json.dumps(entries),  # Serialize list of dictionaries to JSON
             "headers": {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "GET,OPTIONS",
             },
             "statusCode": 200,
-            "isBase64Encoded": "false",
+            "isBase64Encoded": False,  # Boolean value, not a string
         }
+
 
     except:
         return db.log_err(
