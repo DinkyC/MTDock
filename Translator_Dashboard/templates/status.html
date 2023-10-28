@@ -15,22 +15,7 @@
     <!-- DataTables JS -->
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
 
-    <script>
-        $(document).ready(function() {
-            $('#data-table').DataTable({
-                "ajax": {
-                    "url": "/get_status",
-                    "dataSrc": ""
-                },
-                "columns": [
-                    { "data": "status" },
-                    { "data": "title" },
-                    { "data": "lang_to" },
-                    { "data": "lang_from" }
-                ]
-            });
-        });
-    </script>
+    <script src="../static/js/status.js"></script>
 
 <table id="data-table" class="display" style="width:100%">
     <thead>
@@ -39,17 +24,20 @@
             <th>Title</th>
             <th>Lang To</th>
             <th>Lang From</th>
+            <th>Remove</th>
         </tr>
     </thead>
-    <tfoot>
-        <tr>
-            <th>Status</th>
-            <th>Title</th>
-            <th>Lang To</th>
-            <th>Lang From</th>
-        </tr>
-    </tfoot>
-</table>
 
+</table>
+<h1>Database</h1>
+<table id="database-table" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th>Text</th>
+            <th>Queue</th>
+        </tr>
+    </thead>
+
+</table>
 {% endblock %}
 

@@ -73,7 +73,7 @@ def lambda_handler(event, context):
     db = HTDatabase()
     
     query = """
-    SELECT DISTINCT HighTimes.status, HighTimes.title, translations.lang_to, translations.lang_from 
+    SELECT DISTINCT HighTimes.status, HighTimes.title, HighTimes.id, translations.lang_to, translations.lang_from 
     FROM HighTimes 
     LEFT JOIN translations ON HighTimes.id=translations.text_id 
     WHERE HighTimes.status='done' OR HighTimes.status='pending';

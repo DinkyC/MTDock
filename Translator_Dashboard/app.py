@@ -12,16 +12,17 @@ import boto3
 import json
 import hashlib
 import requests
+import logging
 import pandas as pd
 pymysql.install_as_MySQLdb()
 
-
-#CA_CERT = os.environ['CA_CERT']
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 class AWSClient:
     def __init__(self):
         self.ssm = boto3.client("ssm")
-        self.params_keys = ["put_final", "get_status"]
+        self.params_keys = ["put_final", "get_status", "delete_trans"]
 
     def get_database_credentials(self):
         secret = self.get_secret()
@@ -224,7 +225,7 @@ def submit_translations():
 def status():
     aws = AWSClient()
     params_dict = aws.get_parameters_from_store()
-
+    
     response = requests.get(params_dict["get_status"], headers={'Content-Type': 'application/json'})
     
     data = response.json()
@@ -238,6 +239,28 @@ def status():
 def status_page():
     return render_template("status.html")
 
+
+@app.route('/remove_from_queue/<id>', methods=['DELETE', 'POST'])
+@login_required
+def remove(id):
+    aws = AWSClient()
+    params_dict = aws.get_parameters_from_store()
+
+    headers = {'Content-Type': 'application/json'}
+
+    params = {"id": id}
+
+    try:
+        response = requests.delete(params_dict["delete_trans"], params=params, headers=headers)
+        if response.status_code == 200:
+            # Successfully removed item
+            return jsonify({"success": True})
+        else:
+            # Failed to remove item
+            return jsonify({"success": False, "error": "Failed to remove item"}), 500  # Return an error status code
+    except Exception as e:
+        logger.error("Request failed")
+        return jsonify({"success": False, "error": "Request failed"}), 500  # Return an error status code
 
 
 if __name__ == "__main__":

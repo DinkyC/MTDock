@@ -11,10 +11,15 @@ logger.setLevel(logging.INFO)
 
 
 class HTDatabase:
-    def construct_query(self, title=None, id=None):
+    def construct_query(self, **kwargs):
         base_query = "SELECT id, title, BodyText FROM HighTimes"
         conditions = []
         params = []
+
+        title = kwargs.get('title')
+        id = kwargs.get('id')
+        page = kwargs.get('page')
+        per_page = kwargs.get('per_page')
 
         if title:
             conditions.append("title = %s")
@@ -26,7 +31,11 @@ class HTDatabase:
         if conditions:
             base_query += " WHERE " + " AND ".join(conditions)
 
-        base_query += " LIMIT 1"
+        if page is not None and per_page is not None:
+            offset = (page - 1) * per_page
+            base_query += f" LIMIT {per_page} OFFSET {offset}"
+        else:
+            base_query += " LIMIT 1"
 
         return base_query, params
 
@@ -98,13 +107,16 @@ def handler(event, context):
     id = queryStringParameters.get("id")
     title = queryStringParameters.get("title")
 
+    page = queryStringParameters.get("page")
+    per_page = queryStringParameters.get("per_page")
+
     if not id:
         logger.info("No id provided.")
     if not title:
         logger.info("No title provided.")
 
     try:
-        query, params = db.construct_query(title=title, id=id)
+        query, params = db.construct_query(title=title, id=id, page=page, per_page=per_page)
     except Exception as e:
         logger.error(f"[ERROR]: Cannot construct query. {e}")
         return {
