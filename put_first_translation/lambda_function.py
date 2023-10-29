@@ -60,7 +60,7 @@ class HTDatabase:
             "body": errmsg,
             "headers": {
                 "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET,OPTIONS",
+                "Access-Control-Allow-Methods": "POST,OPTIONS",
             },
             "statusCode": 400,
             "isBase64Encoded": "false",
@@ -87,7 +87,7 @@ def handler(event, context):
                 "statusCode": 500,
                 "headers": {
                 "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET,OPTIONS",
+                "Access-Control-Allow-Methods": "POST,OPTIONS",
                 },
                 "body": "Data corruption. Checksums are not the same.",
             }
@@ -110,7 +110,7 @@ def handler(event, context):
                     "statusCode": 200,
                     "headers": {
                         "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "GET,OPTIONS",
+                        "Access-Control-Allow-Methods": "POST,OPTIONS",
                     },
                     "body": "Article translation already exists.",
                     "isBase64Encoded": "false",
@@ -118,14 +118,10 @@ def handler(event, context):
 
             # Create an INSERT statement
             insert_statement = f"""
-                INSERT INTO translations (text_id, content, providers_id, lang_to, lang_from, checksum)
-                VALUES (%s, %s, %s, %s, %s, %s)
-                ON DUPLICATE KEY UPDATE
-                text_id = VALUES(text_id),
+            INSERT INTO translations (text_id, content, providers_id, lang_to, lang_from, checksum)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE
                 content = VALUES(content),
-                providers_id = VALUES(providers_id),
-                lang_to = VALUES(lang_to),
-                lang_from = VALUES(lang_from),
                 checksum = VALUES(checksum);
             """
             
@@ -175,7 +171,7 @@ def handler(event, context):
             "body": "Data inserted successfully",
             "headers": {
                 "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET,OPTIONS",
+                "Access-Control-Allow-Methods": "POST,OPTIONS",
             },
             "statusCode": 200,
             "isBase64Encoded": "false",

@@ -1,4 +1,11 @@
 /* HT STYLES */
+
+#articleSearch {
+    width: 300px;  /* Adjust as needed */
+    font-size: 18px;  /* Adjust as needed */
+    padding: 5px 10px;  /* Adjust for padding */
+}
+
 .flash-message {
     position: fixed;
     top: 10px;

@@ -13,6 +13,7 @@ import json
 import hashlib
 import requests
 import logging
+import urllib.parse
 import pandas as pd
 pymysql.install_as_MySQLdb()
 
@@ -22,7 +23,6 @@ logger.setLevel(logging.INFO)
 class AWSClient:
     def __init__(self):
         self.ssm = boto3.client("ssm")
-        self.params_keys = ["put_final", "get_status", "delete_trans"]
 
     def get_database_credentials(self):
         secret = self.get_secret()
@@ -41,8 +41,8 @@ class AWSClient:
         except Exception as e:
             raise e
 
-    def get_parameters_from_store(self):
-        response = self.ssm.get_parameters(Names=self.params_keys, WithDecryption=True)
+    def get_parameters_from_store(self, params_keys):
+        response = self.ssm.get_parameters(Names=params_keys, WithDecryption=True)
 
         # Construct a dictionary to hold the parameter values
         params_dict = {}
@@ -172,7 +172,8 @@ def logout():
 @login_required
 def submit_translations():
     aws = AWSClient()
-    params_dict = aws.get_parameters_from_store()
+    parameter = ["put_final"]
+    params_dict = aws.get_parameters_from_store(parameter)
 
     AWSRating = request.form.get('AWSRating')
     GCPRating = request.form.get('GCPRating')
@@ -224,7 +225,8 @@ def submit_translations():
 @login_required
 def status():
     aws = AWSClient()
-    params_dict = aws.get_parameters_from_store()
+    parameter = ["get_status"]
+    params_dict = aws.get_parameters_from_store(parameter)
     
     response = requests.get(params_dict["get_status"], headers={'Content-Type': 'application/json'})
     
@@ -244,7 +246,8 @@ def status_page():
 @login_required
 def remove(id):
     aws = AWSClient()
-    params_dict = aws.get_parameters_from_store()
+    parameter = ["delete_trans"]
+    params_dict = aws.get_parameters_from_store(parameter)
 
     headers = {'Content-Type': 'application/json'}
 
@@ -261,6 +264,76 @@ def remove(id):
     except Exception as e:
         logger.error("Request failed")
         return jsonify({"success": False, "error": "Request failed"}), 500  # Return an error status code
+
+
+@app.route('/queue/<id>', methods=['POST'])
+@login_required
+def queue(id):
+    aws = AWSClient()
+    parameter = ["push_to_fifo"]
+    params_dict = aws.get_parameters_from_store(parameter)
+
+    headers = {'Content-Type': 'application/json'}
+
+    from_lang = request.args.get("from_lang")
+    to_lang = request.args.get("to_lang")
+
+    params = {
+        "from_lang": from_lang,
+        "to_lang": to_lang,
+        "id": id
+            }
+
+    try:
+        response = requests.post(params_dict["push_to_fifo"], params=params, headers=headers)
+        if response.status_code == 200:
+            return jsonify({"success": True})
+        else:
+            return jsonify({"success": False, "error": "Failed to remove item"}), 500  # Return an error status code
+    except Exception as e:
+        logger.error("Request failed")
+        return jsonify({"success": False, "error": "Request failed"}), 500  # Return an error status code
+
+@app.route('/get_articles', methods=['GET'])
+@login_required
+def get_articles():
+    aws = AWSClient()
+    parameter = ["get_article"]
+    params_dict = aws.get_parameters_from_store(parameter)
+    headers = {'Content-Type': 'application/json'}
+
+
+    per_page = request.args.get("per_page")
+    page = request.args.get("page")
+    title = request.args.get("title")
+
+    params = {"page": page, "per_page": per_page}
+
+    if title:
+        decoded_title = urllib.parse.unquote(title)
+        params["title"] = decoded_title
+        try:
+            response = requests.get(params_dict["get_article"], params=params, headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+                df = pd.DataFrame(data, index=[0])
+                return jsonify(df.to_dict(orient='records'))
+        except Exception as e:
+            return jsonify({"success": False, "error": "Failed to get item"}), 500 
+    try:
+        response = requests.get(params_dict["get_article"], params=params, headers=headers)
+        if response.status_code == 200:
+            data = response.json()
+            df = pd.DataFrame(data)
+            return jsonify(df.to_dict(orient='records'))
+        else:
+            return jsonify({"success": False, "error": "Failed to get items"}), 500  # Return an error status code
+    except Exception as e:
+        logger.error("Request failed")
+        return jsonify({"success": False, "error": "Request failed"}), 500  # Return an error status code
+
+   
+
 
 
 if __name__ == "__main__":

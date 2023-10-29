@@ -13,8 +13,8 @@ logger.setLevel(logging.INFO)
 class HTDatabase:
     def construct_query(self, **kwargs):
         base_query = """
-        SELECT status, translations.content, lang_to, lang_from, providers_id, text_id 
-        FROM translations 
+        SELECT status, translations.content, lang_to, lang_from, providers_id, text_id
+        FROM translations
         INNER JOIN HighTimes ON translations.text_id = HighTimes.id
         """
         conditions = []
@@ -38,6 +38,10 @@ class HTDatabase:
             conditions.append("translations.providers_id = %s")
             params.append(kwargs["providers_id"])
 
+        # Add a condition for lang_to, if specified
+        if kwargs.get("lang_to"):
+            conditions.append("translations.lang_to = %s")
+            params.append(kwargs["lang_to"])
 
         if conditions:
             base_query += " WHERE " + " AND ".join(conditions)
@@ -45,7 +49,6 @@ class HTDatabase:
         base_query += " LIMIT 1"
 
         return base_query, params
-
 
     def get_database_credentials(self):
         secret = self.get_secret()
@@ -115,6 +118,7 @@ def lambda_handler(event, context):
     providers_id = queryStringParameters.get("providers_id")
 
     direction = queryStringParameters.get("direction")
+    lang_to = queryStringParameters.get("to_lang")
 
     if not id:
         logger.info("No id provided.")
@@ -122,7 +126,7 @@ def lambda_handler(event, context):
         logger.info("No title provided.")
 
     try:
-        query, params = db.construct_query(title=title, id=id, direction=direction, providers_id=providers_id)
+        query, params = db.construct_query(title=title, id=id, direction=direction, providers_id=providers_id, lang_to=lang_to)
     except Exception as e:
         logger.error(f"[ERROR]: Cannot construct query. {e}")
         return {

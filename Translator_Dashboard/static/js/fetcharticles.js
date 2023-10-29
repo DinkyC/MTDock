@@ -15,10 +15,11 @@ function getProviderColumns(provider) {
 }
 
 function fetchTranslationForService(service) {
+    let to_lang = document.getElementById("selectTranslatedTo")
     let providers_id = getProviderColumns(service);
     let fetchUrl = (currentIndex == 1) 
-        ? `${CONFIG.API_ENDPOINT}/get-first?providers_id=${providers_id}&direction=next&id=0`
-        : `${CONFIG.API_ENDPOINT}/get-first?providers_id=${providers_id}&direction=next&id=${currentIndex}`;
+        ? `${CONFIG.API_ENDPOINT}/get-first?providers_id=${providers_id}&direction=next&to_lang=${to_lang.value}&id=0`
+        : `${CONFIG.API_ENDPOINT}/get-first?providers_id=${providers_id}&direction=next&to_lang=${to_lang}&id=${currentIndex}`;
 
     return fetch(fetchUrl)
         .then(response => {
@@ -28,10 +29,11 @@ function fetchTranslationForService(service) {
 }
 
 function fetchTranslationForServicePrev(service) {
+    let to_lang = document.getElementById("selectTranslatedTo")
     let providers_id = getProviderColumns(service);
     let fetchUrl = (currentIndex == 1) 
-        ? `${CONFIG.API_ENDPOINT}/get-first?providers_id=${providers_id}&direction=prev&id=0`
-        : `${CONFIG.API_ENDPOINT}/get-first?providers_id=${providers_id}&direction=prev&id=${currentIndex}`;
+        ? `${CONFIG.API_ENDPOINT}/get-first?providers_id=${providers_id}&direction=prev&to_lang=${to_lang.value}&id=0`
+        : `${CONFIG.API_ENDPOINT}/get-first?providers_id=${providers_id}&direction=prev&to_lang=${to_lang}&id=${currentIndex}`;
 
     return fetch(fetchUrl)
         .then(response => {
@@ -240,6 +242,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+document.getElementById('Languagedropdown').addEventListener('change', function() {
+    const currentLang = document.getElementById('selectTranslatedTo');
+    if (currentLang) {
+        currentLang.value = this.value;
+        updateTranslationElements()
+    } else {
+        console.log("currentLang not found!")
+    }
+    console.log("Selected value:", this.value);
+});
+
+
 document.getElementById('dropdown').addEventListener('change', function() {
     const currentLang = document.getElementById('translateTo');
     if (currentLang) {
@@ -267,6 +281,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize when the document is ready
 $(document).ready(function() {
-    updateTranslationElements();
+    let lang_to = document.getElementById("selectTranslatedTo")
+    if (lang_to.value) {
+        updateTranslationElements();
+    }
 });
 

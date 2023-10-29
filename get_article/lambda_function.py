@@ -32,7 +32,7 @@ class HTDatabase:
             base_query += " WHERE " + " AND ".join(conditions)
 
         if page is not None and per_page is not None:
-            offset = (page - 1) * per_page
+            offset = (int(page) - 1) * int(per_page)
             base_query += f" LIMIT {per_page} OFFSET {offset}"
         else:
             base_query += " LIMIT 1"

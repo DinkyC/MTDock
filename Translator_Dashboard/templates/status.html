@@ -4,7 +4,6 @@
 
 {% block content %}
 
-    <title>DataTables Integration</title>
 
     <!-- DataTables CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
@@ -17,6 +16,8 @@
 
     <script src="../static/js/status.js"></script>
 
+<input type="hidden" id="selectedFromLang" value="">
+<input type="hidden" id="selectedToLang" value="">
 <table id="data-table" class="display" style="width:100%">
     <thead>
         <tr>
@@ -29,12 +30,27 @@
     </thead>
 
 </table>
-<h1>Database</h1>
+<h1 class="mt-4">Database</h1>
+    <input type="text" id="articleSearch" placeholder="Search by title...">
+    <button class="custom-button" id="searchButton">Search</button>
+<div>
+   <!-- Column for the arrow buttons -->
+    <div class="col-md-6 justify-content-between">
+        <button class="custom-button mb-3 mt-4 mr-5" id="prev-button">
+            <span class="fas fa-arrow-left"></span>
+        </button>
+        <button class="custom-button mb-3 mt-4 mr-5" id="next-button">
+            <span class="fas fa-arrow-right"></span>
+        </button>
+    </div> 
+</div>
 <table id="database-table" class="display" style="width:100%">
     <thead>
         <tr>
             <th>Text</th>
+            <th>Title</th>
             <th>Queue</th>
+            <th></th>
         </tr>
     </thead>
 
