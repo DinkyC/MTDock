@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HT Translator</title>
+    <title>MT Dock</title>
     <!-- Enlace a Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- HT Custom Styles -->
@@ -17,12 +17,12 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Barra lateral -->
-            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+            <nav class="d-flex flex-column col-md-3 col-lg-2 d-md-block bg-light sidebar">
                 <div class="sidebar-logo">
-                    <img src="../static/img/logo-ht-b.svg" alt="Logo Hightimes">
+                    <img src="../static/img/mt-dock-logo.svg" alt="Logo Hightimes">
                 </div>
                 <div class="sidebar-separator"></div>
-                <ul class="nav flex-column">
+                <ul class="nav flex-column flex-grow-1">
                     <li class="nav-item">
                         <a class="nav-link" href="/dashboard" style="color: #1B2559;">
                             <li class="fas fa-bolt mr-2"></i>
@@ -40,12 +40,13 @@
                             <span class="small-title">Status</span>
                         </a>
                     </li>
-                </ul>
-                <div class="logout-button mt-auto">
-                    <a href="{{ url_for('logout') }}" class="btn" style="background-color: #FFFFFF; border-radius: 10px; padding: 15px 25px; box-shadow: 0px 15px 20px 5px rgba(112, 144, 176, 0.25); margin-top:235vh; width:200px;">
+                <div class="flex-spacer"></div>
+                <div class="logout-button">
+                    <a href="{{ url_for('logout') }}" class="btn">
                         Log Out <i class="fas fa-sign-out-alt ml-2"></i>
                     </a>
                 </div>
+                </ul>
             </nav>
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 {% block content %}{% endblock %}
@@ -54,7 +55,7 @@
     </div>
 	<div class="footer">
 		<!-- Footer content -->
-		© 2023 High Times Español
+		© 2023 MT Dock 
 	</div>
 	<!-- Enlace a Bootstrap JS -->
 

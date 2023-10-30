@@ -15,7 +15,7 @@ function getProviderColumns(provider) {
 }
 
 function fetchTranslationForService(service) {
-    let to_lang = document.getElementById("selectTranslatedTo")
+    let to_lang = document.getElementById("translateTo")
     let providers_id = getProviderColumns(service);
     let fetchUrl = (currentIndex == 1) 
         ? `${CONFIG.API_ENDPOINT}/get-first?providers_id=${providers_id}&direction=next&to_lang=${to_lang.value}&id=0`
@@ -29,7 +29,7 @@ function fetchTranslationForService(service) {
 }
 
 function fetchTranslationForServicePrev(service) {
-    let to_lang = document.getElementById("selectTranslatedTo")
+    let to_lang = document.getElementById("translateTo")
     let providers_id = getProviderColumns(service);
     let fetchUrl = (currentIndex == 1) 
         ? `${CONFIG.API_ENDPOINT}/get-first?providers_id=${providers_id}&direction=prev&to_lang=${to_lang.value}&id=0`
@@ -169,6 +169,7 @@ function updateCurrentIndexInput() {
     }
 }
 
+<<<<<<< Updated upstream
 function regenerateTranslation() {
     const currentIndex = document.getElementById('currentIndexInput').value;
     const lang = document.getElementById('translateTo').value;
@@ -204,6 +205,8 @@ function regenerateTranslation() {
             });
     }
 }
+=======
+>>>>>>> Stashed changes
 
 function setRating(platform, ratingValue) {
     let ratingElementId;
@@ -235,15 +238,10 @@ function setRating(platform, ratingValue) {
 }
 
 
-document.addEventListener('DOMContentLoaded', function() {
-    const regenButton = document.getElementById('regenerate');
-    if (regenButton) {
-        regenButton.addEventListener('click', regenerateTranslation);
-    }
-});
 
-document.getElementById('Languagedropdown').addEventListener('change', function() {
-    const currentLang = document.getElementById('selectTranslatedTo');
+
+document.getElementById('dropdown').addEventListener('change', function() {
+    let currentLang = document.getElementById('translateTo');
     if (currentLang) {
         currentLang.value = this.value;
         updateTranslationElements()
@@ -264,10 +262,11 @@ document.getElementById('dropdown').addEventListener('change', function() {
     console.log("Selected value:", this.value);
 });
 
-// Event listener for 'Next Article' button
-// Using jQuery to select the button and attach an event
-$('.custom-button:contains("Next Translation")').click(function() {
-    updateTranslationElements();
+document.addEventListener('DOMContentLoaded', function() {
+    let nextButton = document.getElementById('next');
+    if (nextButton) {
+        nextButton.addEventListener('click', updateTranslationElements);
+    }
 });
 
 // Event listener for 'Previous Article' button
@@ -280,8 +279,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 // Initialize when the document is ready
-$(document).ready(function() {
-    let lang_to = document.getElementById("selectTranslatedTo")
+document.addEventListener('DOMContentLoaded', function() {
+    let lang_to = document.getElementById("translatedTo")
     if (lang_to.value) {
         updateTranslationElements();
     }

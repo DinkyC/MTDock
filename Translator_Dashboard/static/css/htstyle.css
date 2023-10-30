@@ -1,9 +1,9 @@
 /* HT STYLES */
 
 #articleSearch {
-    width: 300px;  /* Adjust as needed */
-    font-size: 18px;  /* Adjust as needed */
-    padding: 5px 10px;  /* Adjust for padding */
+    width: 300px;  
+    font-size: 18px;  
+    padding: 5px 10px;  
 }
 
 .flash-message {
@@ -91,6 +91,11 @@ body, html {
 	.left-side, .right-side {
 		flex: 1;
 	}
+
+    .sidebar {
+        justify-content: center;   /* Center contents vertically */
+        align-items: center;       /* Center contents horizontally */
+    }
 }
 
 /* DASHBOARD STYLES */
@@ -118,20 +123,6 @@ select::after {
     pointer-events: none;
 }
 
-#spinner {
-    width: 50px;
-    height: 50px;
-    border: 5px solid #eee;
-    border-top: 5px solid #666;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
 .custom-button {
 	border-radius: 30px;
 	background-color: #4318FF;
@@ -148,10 +139,10 @@ select::after {
 	color: #1B2559;
 }
 .sidebar {
+    position: relative;
 	background-color: #ffffff !important; /* Color de fondo de la barra lateral */
 	border-radius: 20px; /* Borde redondeado de la barra lateral */
 	box-shadow: 0px 17px 40px 4px rgba(112, 144, 176, 0.11); /* Sombra */
-    height: auto;
     min-height: 100vh;
     display: flex;           
     flex-direction: column;
@@ -189,42 +180,6 @@ select::after {
   cursor: pointer; /* Change the mouse cursor when hovering over the button */
 }
 
-.round-button-circle {
-  width: 90% !important;
-  height: 0 !important;
-  padding-bottom: 50% !important;
-  border-radius: 50% !important;
-  border: 5px solid #cfdcec !important; /* Reduced border to make it smaller */
-  overflow: hidden !important;
-  background: #4679BD !important;
-  box-shadow: 0 0 3px gray !important;
-  transition: background 0.3s; /* Smooth transition for background color change */
-}
-
-.round-button-circle:hover {
-  background: #30588e !important;
-}
-
-.round-button-circle:focus {
-  background: #2a4a6e !important; /* Slightly darker color when button is pressed */
-  cursor: pointer !important;
-}
-
-.round-button a {
-  display: block !important;
-  width: 100% !important;
-  padding-top: 50% !important;
-  padding-bottom: 70% !important;
-  line-height: 1em !important;
-  margin-top: -0.5em !important;
-  text-align: center !important;
-  color: #e2eaf3 !important;
-  font-family: Verdana !important;
-  font-size: 0.8em !important; /* Reduced font size to fit the smaller button */
-  font-weight: bold !important;
-  text-decoration: none !important;
-}
-
 .text-container {
     border: 1px solid #ccc;
     padding: 10px;
@@ -249,13 +204,22 @@ select::after {
 	left: 0;
 	margin: 10px 10px;
 }
+
 .logout-button {
-    flex-grow: 1;
-	margin-bottom: auto;
-	padding: 10px 0;
-	text-align: center;
-    height: auto;
+    position: absolute;
+    bottom: 0;
+    text-align: center;
+    background-color: #FFFFFF;
+    border-radius: 10px;
+    padding: 15px 25px;
+    box-shadow: 0px 15px 20px 5px rgba(112, 144, 176, 0.25);
+    width: 200px;  /* Consider using a percentage or max-width for responsiveness */
 }
+.flex-spacer {
+    flex-grow: 1;
+}
+
+
 .section-title {
 	font-size: 18px;
 	color: #1B2559;
