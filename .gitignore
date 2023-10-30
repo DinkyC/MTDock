@@ -21,6 +21,8 @@
 !get_final/*
 !get_status/
 !get_status/*
+!delete_translation/
+!delete_translation/*
 !README.md
 # Ignore zip files and env directories everywhere
 *.zip
