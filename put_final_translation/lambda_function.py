@@ -276,7 +276,7 @@ def handler(event, context):
 #
 # if __name__ == "__main__":
 #     data = {"text": "hello", "id": 5, "aws_rating": 2, "gcp_rating": 3, "azure_rating": 4, "comments": "", "checksum": "49ada0c9015d01690a9494975260fa2ceebc02f9c3ca23fc1baab9a52eb3b2d6"}
-#     load = json.dumps(data)
+#id=1&from_lang='en'&to_lang='es'     load = json.dumps(data)
 #     event = {
 #       "resource": "/your/resource/path",
 #       "path": "/your/resource/path",

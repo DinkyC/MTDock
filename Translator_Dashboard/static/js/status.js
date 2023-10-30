@@ -2,6 +2,7 @@ var dataTable; // Declare dataTable outside the document.ready function
 var databaseTable; // Declare table for database
 
 $(document).ready(function() {
+    // Initialize DataTable
     dataTable = $('#data-table').DataTable({
         "ajax": {
             "url": "/get_status",
@@ -15,7 +16,8 @@ $(document).ready(function() {
             {
                 "data": "id",
                 "render": function(data, type, row) {
-                    return '<a href="#" class="btn btn-primary remove-button" data-id="' + data + '">Remove</a>';
+                    // Added a new data-newid attribute for the button
+                    return '<a href="#" class="btn btn-primary remove-button" data-id="' + data + '" data-lang_to="' + row.lang_to + '" data-lang_from="' + row.lang_from + '">Remove</a>';
                 }
             }
         ]
@@ -24,15 +26,22 @@ $(document).ready(function() {
     // Handle Remove button click event
     $('#data-table').on('click', '.remove-button', function(e) {
         e.preventDefault();
-        var id = $(this).data('id');
-        removeItem(id);
+        var lang_to = $(this).data('lang_to');
+        var lang_from = $(this).data('lang_from');
+        var id = $(this).data('id');  // Retrieve the new id from the button's data attribute
+        removeItem(id, lang_from, lang_to);  // Pass both IDs to the deleteTrans function
     });
 
     // Function to remove item via AJAX
-    function removeItem(id) {
+    function removeItem(id, lang_from, lang_to) {
         $.ajax({
             url: '/remove_from_queue/' + id,
             type: 'DELETE',
+            contentType: 'application/json',  // Set content type to JSON
+            data: JSON.stringify({  // Stringify the data
+                "lang_from": lang_from,
+                "lang_to": lang_to
+            }),
             success: function(response) {
                 if (response.success) {
                     // Removal was successful

@@ -116,14 +116,6 @@ def handler(event, context):
                     "isBase64Encoded": "false",
                 }
 
-            # Create an INSERT statement
-            insert_statement = f"""
-            INSERT INTO translations (text_id, content, providers_id, lang_to, lang_from, checksum)
-            VALUES (%s, %s, %s, %s, %s, %s)
-            ON DUPLICATE KEY UPDATE
-                content = VALUES(content),
-                checksum = VALUES(checksum);
-            """
             
             if data.get("title"):
                 loaded = {"title": data.get("title"), "text": data.get("text")}
@@ -134,8 +126,8 @@ def handler(event, context):
 
             try:
                 # Execute the INSERT statement with the data
-                cursor.execute(
-                    insert_statement,
+                cursor.callproc(
+                    "UpsertTranslation",
                     (data.get("id"), json_data, data.get("providers_id"), data.get("lang_to"), data.get("lang_from"), checksum),
                 )
             except Exception as e:

@@ -250,8 +250,11 @@ def remove(id):
     params_dict = aws.get_parameters_from_store(parameter)
 
     headers = {'Content-Type': 'application/json'}
+    data = request.get_json()  # Get the JSON data from the request body
+    lang_to = data.get("lang_to")
+    lang_from = data.get("lang_from")
 
-    params = {"id": id}
+    params = {"id": id, "lang_to": lang_to, "lang_from": lang_from}
 
     try:
         response = requests.delete(params_dict["delete_trans"], params=params, headers=headers)
