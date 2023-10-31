@@ -61,7 +61,7 @@
 						<h2 class="section-title">AWS</h2>
                         <div class="round-button">
                             <div class="round-button-circle">
-                                <a href="javascript:void(0)" onclick="copyToBaseTranslation('awsTranslation')" class="round-button"></a>
+                                <a href="javascript:void(0)" id="awsButton" class="round-button"></a>
                             </div>
                         </div>
                             <textarea autosize spellcheck="false" class="form-control custom-textarea" id="awsTranslation"></textarea>
@@ -78,7 +78,7 @@
 						<h2 class="section-title">Google Cloud</h2>
                         <div class="round-button">
                             <div class="round-button-circle">
-                                <a href="javascript:void(0)" onclick="copyToBaseTranslation('googleTranslation')" class="round-button"></a>
+                               <a href="javascript:void(0)" id="googleButton" class="round-button"></a> 
                             </div>
                         </div>
                             <textarea autosize spellcheck="false" class="form-control custom-textarea" id="googleTranslation"></textarea>
@@ -95,7 +95,7 @@
 						<h2 class="section-title">Microsoft Azure</h2>
                         <div class="round-button">
                             <div class="round-button-circle">
-                                <a href="javascript:void(0)" onclick="copyToBaseTranslation('azureTranslation')" class="round-button"></a>
+                                <a href="javascript:void(0)" id="azureButton" class="round-button"></a> 
                             </div>
                         </div>
                             <textarea autosize spellcheck="false" class="form-control custom-textarea" id="azureTranslation"></textarea>
@@ -126,44 +126,72 @@
                 <script src="../static/js/fetcharticles.js"></script>
                 <script src="../static/js/download.js"></script>
                 <script>
-                    $(document).ready(function() {
-                        $('textarea').each(function() {
-                            this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:auto;');
-                        }).on('input', function() {
-                            this.style.height = 'auto';
-                            this.style.height = (this.scrollHeight) + 'px';
-                        });
-                    });
-                </script>
-                <script>
-                    function copyToBaseTranslation(id) {
-                        var content = document.getElementById(id).value;
-                        var baseTranslation = document.getElementById('baseTranslation');
-                        baseTranslation.value = content;
-                        }
-                </script>
-                <script>
-                    $(document).ready(function() {
-                        $('textarea').each(function() {
-                            // Save the original height for later
-                            $(this).data('original-height', this.scrollHeight);
+                document.addEventListener("DOMContentLoaded", function() {
+                    // Get all textarea elements
+                    var textareas = document.querySelectorAll('textarea');
 
-                            this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:auto;');
-                        }).on('input', function() {
+                    // Loop through each textarea and set its initial height
+                    textareas.forEach(function(textarea) {
+                        textarea.style.height = textarea.scrollHeight + 'px';
+                        textarea.style.overflowY = 'auto';
+
+                        // Add an input event listener to adjust height dynamically
+                        textarea.addEventListener('input', function() {
                             this.style.height = 'auto';
-                            this.style.height = (this.scrollHeight) + 'px';
-                        }).on('focusout', function() {
-                            // Restore the original height when the textarea loses focus
-                            this.style.height = $(this).data('original-height') + 'px';
+                            this.style.height = this.scrollHeight + 'px';
                         });
                     });
+                });
                 </script>
                 <script>
-                    $(document).ready(function() {
-                        setTimeout(function() {
-                            $('.fadeout').fadeOut('slow');
-                        }, 5000);  // 5 seconds 
+                document.addEventListener("DOMContentLoaded", function() {
+                    // Get all textarea elements
+                    var textareas = document.querySelectorAll('textarea');
+
+                    // Loop through each textarea
+                    textareas.forEach(function(textarea) {
+                        // Save the original height for later
+                        textarea.dataset.originalHeight = textarea.scrollHeight + 'px';
+
+                        // Set the initial height and overflow
+                        textarea.style.height = textarea.scrollHeight + 'px';
+                        textarea.style.overflowY = 'auto';
+
+                        // Adjust height dynamically as the user types
+                        textarea.addEventListener('input', function() {
+                            this.style.height = 'auto';
+                            this.style.height = this.scrollHeight + 'px';
+                        });
+
+                        // Restore the original height when the textarea loses focus
+                        textarea.addEventListener('focusout', function() {
+                            this.style.height = this.dataset.originalHeight;
+                        });
                     });
+                });
+                </script>
+                <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    setTimeout(function() {
+                        var elements = document.querySelectorAll('.fadeout');
+                        for (var i = 0; i < elements.length; i++) {
+                            fadeOut(elements[i]);
+                        }
+                    }, 5000);  // 5 seconds
+                });
+
+                function fadeOut(el) {
+                    var opacity = 1;
+                    var timer = setInterval(function() {
+                        if (opacity <= 0.1) {
+                            clearInterval(timer);
+                            el.style.display = 'none';
+                        }
+                        el.style.opacity = opacity;
+                        opacity -= 0.1;
+                    }, 50);
+                }
+
                 </script>
 
             {% endblock %}

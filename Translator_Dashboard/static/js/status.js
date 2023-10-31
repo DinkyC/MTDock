@@ -1,6 +1,6 @@
 var dataTable; // Declare dataTable outside the document.ready function
 var databaseTable; // Declare table for database
-
+var currentPage = 1; // Initialize the current page
 $(document).ready(function() {
     // Initialize DataTable
     dataTable = $('#data-table').DataTable({
@@ -61,7 +61,6 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-    var currentPage = 1; // Initialize the current page
 
     function fetchData(page) {
         $.ajax({
@@ -80,73 +79,67 @@ $(document).ready(function() {
         });
     }
 
-    var databaseTable = $('#database-table').DataTable({
-        // ... other configurations ...
-        searching: false,
-        lengthChange: false,
-        paging: false,
-        "columns": [
-            { "data": "title", "width": "85px" },
-            { "data": "text" },
-            {
-                "data": "id",
-                "width": "70px",
-                "render": function(data, type, row) {
-                    return '<a href="#" class="btn btn-primary queue-button" data-id="' + data + '">Queue</a>';
-                }
-            },
-            {
-                "data": null, // No specific data field
-                "width": "100px", // Adjust as needed
-                "render": function(data, type, row) {
-                    return `
-                        <select id="from_lang" class="from-lang">
-                            <option value="en">English</option>
-                            <option value="es">Spanish</option>
-                            <option value="ja">Japanese</option>
-                            <option value="pt">Portuguese</option>
-                            <!-- Add more languages as needed -->
-                        </select>
-                        To: <select id="to_lang" class="to-lang">
-                            <option value="en">English</option>
-                            <option value="es">Spanish</option>
-                            <option value="ja">Japanese</option>
-                            <option value="pt">Portuguese</option>
-                            <!-- Add more languages as needed -->
-                        </select>
-                    `;
-                }
+var databaseTable = new DataTable(document.querySelector('#database-table'), {
+    searching: false,
+    lengthChange: false,
+    paging: false,
+    columns: [
+        { data: "title", width: "85px" },
+        { data: "text" },
+        {
+            data: "id",
+            width: "70px",
+            render: function(data, type, row) {
+                return '<a href="#" class="btn btn-primary queue-button" data-id="' + data + '">Queue</a>';
             }
-        ]
-    });
+        },
+        {
+            data: null,
+            width: "100px",
+            render: function(data, type, row) {
+                return `
+                    <select data-row-id="${row.id}" class="from-lang">
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="ja">Japanese</option>
+                        <option value="pt">Portuguese</option>
+                    </select>
+                    To:
+                    <select data-row-id="${row.id}" class="to-lang">
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="ja">Japanese</option>
+                        <option value="pt">Portuguese</option>
+                    </select>
+                `;
+            }
+        }
+    ]
+});
+
+
 
 document.addEventListener("DOMContentLoaded", function() {
-    // Get references to the dropdowns and hidden input fields
-    var fromLangDropdowns = document.queryElementById('from_lang');
-    var toLangDropdowns = document.queryElementById('to_lang');
-    var selectedFromLangInput = document.getElementById('selectedFromLang');
-    var selectedToLangInput = document.getElementById('selectedToLang');
+    const table = document.querySelector('#database-table');
 
-    // Add change event listeners to the 'from' language dropdowns
-    fromLangDropdowns.forEach(function(dropdown) {
-        dropdown.addEventListener('change', function(event) {
-            selectedFromLangInput.value = event.target.value;
-            
-            // For demonstration purposes, print out the values
-            console.log("Selected From Language:", selectedFromLangInput.value);
-        });
-    });
+    table.addEventListener('change', function(event) {
+        const target = event.target;
 
-    // Add change event listeners to the 'to' language dropdowns
-    toLangDropdowns.forEach(function(dropdown) {
-        dropdown.addEventListener('change', function(event) {
-            selectedToLangInput.value = event.target.value;
+        // Check if the event target has the class 'from-lang' or 'to-lang'
+        if (target.classList.contains('from-lang') || target.classList.contains('to-lang')) {
+            const rowId = target.dataset.rowId;
+            const inputId = target.classList.contains('from-lang') ? `selectedFromLang-${rowId}` : `selectedToLang-${rowId}`;
+            const correspondingInput = document.getElementById(inputId);
+
+            if (correspondingInput) {
+                correspondingInput.value = target.value;
+            }
             
-            // For demonstration purposes, print out the values
-            console.log("Selected To Language:", selectedToLangInput.value);
-        });
+            console.log(`Selected ${target.classList.contains('from-lang') ? 'From' : 'To'} Language:`, target.value);
+        }
     });
 });
+
 
 
 

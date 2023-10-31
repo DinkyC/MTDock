@@ -169,45 +169,6 @@ function updateCurrentIndexInput() {
     }
 }
 
-<<<<<<< Updated upstream
-function regenerateTranslation() {
-    const currentIndex = document.getElementById('currentIndexInput').value;
-    const lang = document.getElementById('translateTo').value;
-
-    if (currentIndex && lang) {
-        // Show spinner
-        document.getElementById('spinner').style.display = 'block';
-
-            fetch(`${CONFIG.API_ENDPOINT}/push-to-fifo?id=${currentIndex}&from_lang=en&to_lang=${lang}`, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-                return response.text();
-            })
-            .then(data => {
-                setTimeout(() => {
-
-                    updateTranslationElements();
-                    document.getElementById('spinner').style.display = 'none';
-                }, 5500); // set 15 second delay
-            })
-            .catch(error => {
-                console.error("There was a problem with the fetch operation:", error.message);
-                // Hide spinner
-                document.getElementById('spinner').style.display = 'none';
-            });
-    }
-}
-=======
->>>>>>> Stashed changes
-
 function setRating(platform, ratingValue) {
     let ratingElementId;
     let inputElementId;
@@ -238,7 +199,29 @@ function setRating(platform, ratingValue) {
 }
 
 
+document.addEventListener("DOMContentLoaded", function() {
+    function addEventListenerForTranslation(buttonId, translationId) {
+        let button = document.getElementById(buttonId);
+        if (button) {
+            console.log("triggered!");
+            button.addEventListener('click', function() {
+                console.log("clicked");
+                copyToBaseTranslation(translationId);
+            });
+        }
+    }
 
+    // Add event listeners for AWS, Google, and Azure translations
+    addEventListenerForTranslation('awsButton', 'awsTranslation');
+    addEventListenerForTranslation('googleButton', 'googleTranslation');
+    addEventListenerForTranslation('azureButton', 'azureTranslation');
+});
+
+  function copyToBaseTranslation(id) {
+        var content = document.getElementById(id).value;
+        var baseTranslation = document.getElementById('baseTranslation');
+        baseTranslation.value = content;
+        }
 
 document.getElementById('dropdown').addEventListener('change', function() {
     let currentLang = document.getElementById('translateTo');
@@ -280,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize when the document is ready
 document.addEventListener('DOMContentLoaded', function() {
-    let lang_to = document.getElementById("translatedTo")
+    let lang_to = document.getElementById("translateTo")
     if (lang_to.value) {
         updateTranslationElements();
     }

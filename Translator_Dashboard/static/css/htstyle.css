@@ -186,6 +186,41 @@ select::after {
     border-radius: 5px;
     margin-bottom: 10px;
 }
+.round-button-circle {
+    width: 90%;
+    height: 0;
+    padding-bottom: 50%;
+    border-radius: 50%;
+    border: 5px solid #cfdcec;
+    overflow: hidden;
+    background: #4679BD;
+    box-shadow: 0 0 3px gray;
+    transition: background 0.3s;
+}
+
+.round-button-circle:hover {
+    background: #30588e !important;
+}
+
+.round-button-circle:focus {
+    background: #2a4a6e !important;
+    cursor: pointer !important;
+}
+
+.round-button a {
+    display: block !important;
+    width: 100% !important;
+    padding-top: 50% !important;
+    padding-bottom: 70% !important;
+    line-height: 1em !important;
+    margin-top: -0.5em !important;
+    text-align: center !important;
+    color: #e2eaf3 !important;
+    font-family: Verdana !important;
+    font-size: 0.8em !important;
+    font-weight: bold !important;
+    text-decoration: none!important;
+}
 
 #title {
     margin-bottom: 10px;
