@@ -1,5 +1,5 @@
 
-let currentIndex = 1; 
+let currentIndex = 0; 
 
 function getProviderColumns(provider) {
     switch (provider) {
@@ -17,10 +17,7 @@ function getProviderColumns(provider) {
 function fetchTranslationForService(service) {
     let to_lang = document.getElementById("translateTo")
     let providers_id = getProviderColumns(service);
-    let fetchUrl = (currentIndex == 1) 
-        ? `${CONFIG.API_ENDPOINT}/get-first?providers_id=${providers_id}&direction=next&to_lang=${to_lang.value}&id=0`
-        : `${CONFIG.API_ENDPOINT}/get-first?providers_id=${providers_id}&direction=next&to_lang=${to_lang}&id=${currentIndex}`;
-
+    let fetchUrl = `${CONFIG.API_ENDPOINT}/get-first?providers_id=${providers_id}&direction=next&to_lang=${to_lang.value}&id=${currentIndex}`;
     return fetch(fetchUrl)
         .then(response => {
 
@@ -31,10 +28,7 @@ function fetchTranslationForService(service) {
 function fetchTranslationForServicePrev(service) {
     let to_lang = document.getElementById("translateTo")
     let providers_id = getProviderColumns(service);
-    let fetchUrl = (currentIndex == 1) 
-        ? `${CONFIG.API_ENDPOINT}/get-first?providers_id=${providers_id}&direction=prev&to_lang=${to_lang.value}&id=0`
-        : `${CONFIG.API_ENDPOINT}/get-first?providers_id=${providers_id}&direction=prev&to_lang=${to_lang}&id=${currentIndex}`;
-
+    let fetchUrl = `${CONFIG.API_ENDPOINT}/get-first?providers_id=${providers_id}&direction=prev&to_lang=${to_lang.value}&id=${currentIndex}`;
     return fetch(fetchUrl)
         .then(response => {
             if (!response.ok && response.status === 400) {
@@ -250,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (nextButton) {
         nextButton.addEventListener('click', updateTranslationElements);
     }
-});
+})
 
 // Event listener for 'Previous Article' button
 document.addEventListener('DOMContentLoaded', function() {

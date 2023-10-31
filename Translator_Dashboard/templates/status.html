@@ -16,46 +16,46 @@
 
     <script src="../static/js/status.js"></script>
 
-<table id="data-table" class="display" style="width:100%">
-    <thead>
-        <tr>
-            <th>Status</th>
-            <th>Title</th>
-            <th>Lang To</th>
-            <th>Lang From</th>
-            <th>Remove</th>
-        </tr>
-    </thead>
+    <input type="hidden" id="selectedFromLang" value="">
+    <input type="hidden" id="selectedToLang" value="">
 
-</table>
-<h1 class="mt-4">Database</h1>
-    <input type="text" id="articleSearch" placeholder="Search by title...">
-    <button class="custom-button" id="searchButton">Search</button>
-<div>
-   <!-- Column for the arrow buttons -->
-    <div class="col-md-6 justify-content-between">
-        <button class="custom-button mb-3 mt-4 mr-5" id="prev-button">
-            <span class="fas fa-arrow-left"></span>
-        </button>
-        <button class="custom-button mb-3 mt-4 mr-5" id="next-button">
-            <span class="fas fa-arrow-right"></span>
-        </button>
-    </div> 
-</div>
-<table id="database-table" class="display" style="width:100%">
-    <input type="hidden" id="selectedFromLang-1" name="selectedFromLang-1" value="">
-    <input type="hidden" id="selectedToLang-1" name="selectedToLang-1" value="">
-    <input type="hidden" id="selectedFromLang-2" name="selectedFromLang-2" value="">
-    <input type="hidden" id="selectedToLang-2" name="selectedToLang-2" value="">
-    <thead>
-        <tr>
-            <th>Text</th>
-            <th>Title</th>
-            <th>Queue</th>
-            <th></th>
-        </tr>
-    </thead>
 
-</table>
+    <table id="data-table" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Status</th>
+                <th>Title</th>
+                <th>Lang To</th>
+                <th>Lang From</th>
+                <th>Remove</th>
+            </tr>
+        </thead>
+
+    </table>
+    <h1 class="mt-4">Database</h1>
+        <input type="text" id="articleSearch" placeholder="Search by title...">
+        <button class="custom-button" id="searchButton">Search</button>
+    <div>
+       <!-- Column for the arrow buttons -->
+        <div class="col-md-6 justify-content-between">
+            <button class="custom-button mb-3 mt-4 mr-5" id="prev-button">
+                <span class="fas fa-arrow-left"></span>
+            </button>
+            <button class="custom-button mb-3 mt-4 mr-5" id="next-button">
+                <span class="fas fa-arrow-right"></span>
+            </button>
+        </div> 
+    </div>
+    <table id="database-table" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Text</th>
+                <th>Title</th>
+                <th>Queue</th>
+                <th></th>
+            </tr>
+        </thead>
+
+    </table>
 {% endblock %}
 

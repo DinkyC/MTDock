@@ -1,6 +1,7 @@
 var dataTable; // Declare dataTable outside the document.ready function
 var databaseTable; // Declare table for database
 var currentPage = 1; // Initialize the current page
+
 $(document).ready(function() {
     // Initialize DataTable
     dataTable = $('#data-table').DataTable({
@@ -62,12 +63,11 @@ $(document).ready(function() {
 
 $(document).ready(function() {
 
-    function fetchData(page) {
+    function fetchData(id) {
         $.ajax({
             url: "/get_articles",
             data: {
-                page: page,
-                per_page: 2
+                id: currentPage
             },
             success: function(data) {
                 databaseTable.clear().rows.add(data).draw();
@@ -98,14 +98,14 @@ var databaseTable = new DataTable(document.querySelector('#database-table'), {
             width: "100px",
             render: function(data, type, row) {
                 return `
-                    <select data-row-id="${row.id}" class="from-lang">
+                    <select id="from_lang" class="from-lang">
                         <option value="en">English</option>
                         <option value="es">Spanish</option>
                         <option value="ja">Japanese</option>
                         <option value="pt">Portuguese</option>
                     </select>
                     To:
-                    <select data-row-id="${row.id}" class="to-lang">
+                    <select id="to_lang" class="to-lang">
                         <option value="en">English</option>
                         <option value="es">Spanish</option>
                         <option value="ja">Japanese</option>
@@ -120,26 +120,29 @@ var databaseTable = new DataTable(document.querySelector('#database-table'), {
 
 
 document.addEventListener("DOMContentLoaded", function() {
-    const table = document.querySelector('#database-table');
+    // Get references to the dropdowns and hidden input fields
+    var fromLangDropdown = document.getElementById('from_lang');
+    var toLangDropdown = document.getElementById('to_lang');
+    var selectedFromLangInput = document.getElementById('selectedFromLang');
+    var selectedToLangInput = document.getElementById('selectedToLang');
 
-    table.addEventListener('change', function(event) {
-        const target = event.target;
+    // Add change event listener to the 'from' language dropdown
+    fromLangDropdown.addEventListener('change', function(event) {
+        selectedFromLangInput.value = event.target.value;
 
-        // Check if the event target has the class 'from-lang' or 'to-lang'
-        if (target.classList.contains('from-lang') || target.classList.contains('to-lang')) {
-            const rowId = target.dataset.rowId;
-            const inputId = target.classList.contains('from-lang') ? `selectedFromLang-${rowId}` : `selectedToLang-${rowId}`;
-            const correspondingInput = document.getElementById(inputId);
+        // For demonstration purposes, print out the values
+        console.log("Selected From Language:", selectedFromLangInput.value);
+    });
 
-            if (correspondingInput) {
-                correspondingInput.value = target.value;
-            }
-            
-            console.log(`Selected ${target.classList.contains('from-lang') ? 'From' : 'To'} Language:`, target.value);
-        }
+    // Similarly, you can add an event listener to the 'to' language dropdown if needed
+    // This code assumes you might need similar functionality for the 'to' language dropdown
+    toLangDropdown.addEventListener('change', function(event) {
+        selectedToLangInput.value = event.target.value;
+
+        // For demonstration purposes, print out the values
+        console.log("Selected To Language:", selectedToLangInput.value);
     });
 });
-
 
 
 

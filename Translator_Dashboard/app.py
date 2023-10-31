@@ -304,13 +304,11 @@ def get_articles():
     parameter = ["get_article"]
     params_dict = aws.get_parameters_from_store(parameter)
     headers = {'Content-Type': 'application/json'}
-
-
-    per_page = request.args.get("per_page")
-    page = request.args.get("page")
+    id = request.args.get("id")
+    print(f"id is equal to -> {id}")
     title = request.args.get("title")
 
-    params = {"page": page, "per_page": per_page}
+    params = {"id": id}
 
     if title:
         decoded_title = urllib.parse.unquote(title)
@@ -327,8 +325,12 @@ def get_articles():
         response = requests.get(params_dict["get_article"], params=params, headers=headers)
         if response.status_code == 200:
             data = response.json()
-            df = pd.DataFrame(data)
-            return jsonify(df.to_dict(orient='records'))
+            if isinstance(data, dict):
+                df = pd.DataFrame(data, index=[0])
+                return jsonify(df.to_dict(orient='records'))
+            else:
+                df = pd.DataFrame(data)
+                return jsonify(df.to_dict(orient='records'))
         else:
             return jsonify({"success": False, "error": "Failed to get items"}), 500  # Return an error status code
     except Exception as e:
