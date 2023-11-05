@@ -15,11 +15,13 @@ import requests
 import logging
 import urllib.parse
 import pandas as pd
+from dotenv import load_dotenv
 pymysql.install_as_MySQLdb()
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+load_dotenv()
 class AWSClient:
     def __init__(self):
         self.ssm = boto3.client("ssm")
@@ -27,7 +29,7 @@ class AWSClient:
     def get_database_credentials(self):
         secret = self.get_secret()
         secret_dict = json.loads(secret)
-        return secret_dict.get('username'), secret_dict.get('port'), secret_dict.get('database'), secret_dict.get('database_endpoint'), secret_dict.get('password')
+        return secret_dict.get('username'), secret_dict.get('port'), secret_dict.get('database'), secret_dict.get('host')
 
 
     def get_secret(self):
@@ -56,30 +58,30 @@ class AWSClient:
         return hashlib.sha256(str(data).encode("utf-8")).digest()
 
 
-    # def make_token(self):
-    #     rds_client = boto3.client('rds')
-    #
-    #     username, port, database, endpoint = self.get_database_credentials()
-    #
-    #     database_token = rds_client.generate_db_auth_token(
-    #         DBHostname=endpoint,
-    #         Port=port,
-    #         DBUsername=username,
-    #         Region=os.environ['AWS_REGION']
-    #         )
-    #
-    #     return database_token 
-    #
+    def make_token(self):
+        rds_client = boto3.client('rds')
+
+        username, port, database, endpoint = self.get_database_credentials()
+
+        database_token = rds_client.generate_db_auth_token(
+            DBHostname=endpoint,
+            Port=port,
+            DBUsername=username,
+            Region=os.environ['AWS_REGION']
+            )
+
+        return database_token 
+
 def create_app():
     aws = AWSClient()
 
-    username, port, database, host, password = aws.get_database_credentials()
+    username, port, database, host = aws.get_database_credentials()
 
-   # token = aws.make_token()
+    token = aws.make_token()
 
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{username}:{password}@{host}/{database}" #?ssl=1&ssl_ca=/home/daniel/dev/translate/TranslationPortalAWS/Translator_Dashboard/certs/AmazonRootCA1.pem"
-    app.config['SECRET_KEY'] = 'thisisasecretkey'
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{username}:{token}@{host}/{database}?ssl=1&ssl_ca={SSL_CERT}" 
+    app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
     app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=14)
 
     db = SQLAlchemy()
@@ -344,4 +346,4 @@ def get_articles():
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    app.run(port=8000)
