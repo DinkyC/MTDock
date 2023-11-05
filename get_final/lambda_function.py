@@ -3,7 +3,7 @@ import logging
 import traceback
 import os
 import json
-import pdb
+# import pdb
 import boto3
 
 logger = logging.getLogger()
@@ -93,7 +93,7 @@ class HTDatabase:
         return {
             "body": errmsg,
             "headers": {
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": "https://mtdock.com",
                 "Access-Control-Allow-Methods": "GET,OPTIONS",
             },
             "statusCode": 400,
@@ -127,7 +127,7 @@ def lambda_handler(event, context):
         return {
             "statusCode": 500,
             "headers": {
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": "https://mtdock.com",
                 "Access-Control-Allow-Methods": "GET,OPTIONS",
             },
             "body": f"[ERROR]: Cannot construct query.\n{str(e)}",
@@ -166,7 +166,7 @@ def lambda_handler(event, context):
         return {
             "body": json.dumps(entry),  # Serialize list to JSON
             "headers": {
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": "https://mtdock.com",
                 "Access-Control-Allow-Methods": "GET,OPTIONS",
             },
             "statusCode": 200,

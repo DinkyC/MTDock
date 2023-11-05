@@ -59,7 +59,7 @@ class HTDatabase:
         return {
             "body": errmsg,
             "headers": {
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": "https://mtdock.com",
                 "Access-Control-Allow-Methods": "POST,OPTIONS",
             },
             "statusCode": 400,
@@ -86,7 +86,7 @@ def handler(event, context):
             return {
                 "statusCode": 500,
                 "headers": {
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": "https://mtdock.com",
                 "Access-Control-Allow-Methods": "POST,OPTIONS",
                 },
                 "body": "Data corruption. Checksums are not the same.",
@@ -109,7 +109,7 @@ def handler(event, context):
                 return {
                     "statusCode": 200,
                     "headers": {
-                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Origin": "https://mtdock.com",
                         "Access-Control-Allow-Methods": "POST,OPTIONS",
                     },
                     "body": "Article translation already exists.",
@@ -162,7 +162,7 @@ def handler(event, context):
         return {
             "body": "Data inserted successfully",
             "headers": {
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": "https://mtdock.com",
                 "Access-Control-Allow-Methods": "POST,OPTIONS",
             },
             "statusCode": 200,

@@ -72,8 +72,8 @@ def lambda_handler(event, context):
                 "statusCode": 500,
                 "body": f"ERROR: Cannot call api.\n{str(e)}",
                 "headers": {
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "GET,OPTIONS",
+                    "Access-Control-Allow-Origin": "https://mtdock.com",
+                    "Access-Control-Allow-Methods": "POST,OPTIONS",
                     "Content-Type": "application/json",
                     "Accept": "application/json"
                     },
@@ -93,8 +93,8 @@ def lambda_handler(event, context):
         return {
                 "statusCode": 200,  
                 "headers": {
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "GET,OPTIONS",
+                    "Access-Control-Allow-Origin": "https://mtdock.com",
+                    "Access-Control-Allow-Methods": "POST,OPTIONS",
                     "Content-Type": "application/json",
                     "Accept": "application/json"
                 },
@@ -105,8 +105,8 @@ def lambda_handler(event, context):
                 "statusCode": 500, 
                 "body": f"ERROR: Cannot call api.\n{str(e)}",
                 "headers": {
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "GET,OPTIONS",
+                    "Access-Control-Allow-Origin": "https://mtdock.com",
+                    "Access-Control-Allow-Methods": "POST,OPTIONS",
                     "Content-Type": "application/json",
                     "Accept": "application/json"
                     },
@@ -117,7 +117,7 @@ def lambda_handler(event, context):
 #     event = {
 #         "resource": "/your/resource/path",
 #         "path": "/your/resource/path",
-#         "httpMethod": "POST",
+#         "httpsMethod": "POST",
 #         "headers": {
 #             "Accept": "*/*",
 #             "Content-Type": "application/json",
@@ -135,7 +135,7 @@ def lambda_handler(event, context):
 #         "requestContext": {
 #             "requestId": "request-id",
 #             "path": "/your/resource/path",
-#             "httpMethod": "POST",
+#             "httpsMethod": "POST",
 #             "stage": "prod",
 #         },
 #         "isBase64Encoded": "false",

@@ -58,7 +58,7 @@ class HTDatabase:
         return {
             "body": errmsg,
             "headers": {
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": "https://mtdock.com",
                 "Access-Control-Allow-Methods": "DELETE,OPTIONS",
             },
             "statusCode": 400,
@@ -119,7 +119,7 @@ def lambda_handler(event, context):
         return {
             "body": "Deleted translations",  
             "headers": {
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": "https://mtdock.com",
                 "Access-Control-Allow-Methods": "DELETE,OPTIONS",
             },
             "statusCode": 200,

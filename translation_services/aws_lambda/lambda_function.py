@@ -109,7 +109,7 @@ class AWSClient:
         return {
             "body": errmsg,
             "headers": {
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": "http://mtdock.com",
                 "Access-Control-Allow-Methods": "GET,OPTIONS",
             },
             "statusCode": 400,

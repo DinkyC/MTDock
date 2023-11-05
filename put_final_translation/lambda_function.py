@@ -5,7 +5,7 @@ import os
 import hashlib
 import boto3
 import json
-import pdb
+# import pdb
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
@@ -59,7 +59,7 @@ class HTDatabase:
         return {
             "body": errmsg,
             "headers": {
-                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Origin": "https://mtdock.com",
                     "Access-Control-Allow-Methods": "POST,OPTIONS",
             },
             "statusCode": 400,
@@ -91,7 +91,7 @@ def handler(event, context):
                 "statusCode": 500,
                 "body": "Data corruption",
                 "headers": {
-                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Origin": "https://mtdock.com",
                     "Access-Control-Allow-Methods": "POST,OPTIONS",
                 },
                 "isBase64Encoded": "false",
@@ -112,7 +112,7 @@ def handler(event, context):
                     "statusCode": 200,
                     "body": "Article already exists.",
                     "headers": {
-                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Origin": "https://mtdock.com",
                         "Access-Control-Allow-Methods": "POST,OPTIONS",
                     },
                     "isBase64Encoded": "false",
@@ -175,7 +175,7 @@ def handler(event, context):
                     "statusCode": 500,
                     "body": "Element not passed in",
                     "headers": {
-                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Origin": "https://mtdock.com",
                         "Access-Control-Allow-Methods": "POST,OPTIONS",
                     },
                     "isBase64Encoded": "false",
@@ -253,7 +253,7 @@ def handler(event, context):
         return {
             "body": "Data inserted successfully",
             "headers": {
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": "https://mtdock.com",
                 "Access-Control-Allow-Methods": "POST,OPTIONS",
             },
             "statusCode": 200,
@@ -280,7 +280,7 @@ def handler(event, context):
 #     event = {
 #       "resource": "/your/resource/path",
 #       "path": "/your/resource/path",
-#       "httpMethod": "POST",
+#       "httpsMethod": "POST",
 #       "headers": {
 #         "Accept": "*/*",
 #         "Content-Type": "application/json",
@@ -308,7 +308,7 @@ def handler(event, context):
 #       "requestContext": {
 #         "requestId": "request-id",
 #         "path": "/your/resource/path",
-#         "httpMethod": "POST",
+#         "httpsMethod": "POST",
 #         "stage": "prod"
 #       },
 #       "body": load,
