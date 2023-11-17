@@ -87,7 +87,7 @@ class HTDatabase:
         return {
             "body": errmsg,
             "headers": {
-                "Access-Control-Allow-Origin": "http://mtdock.com",
+                "Access-Control-Allow-Origin": "https://mtdock.com",
                 "Access-Control-Allow-Methods": "GET,OPTIONS",
             },
             "statusCode": 400,
@@ -122,7 +122,7 @@ def handler(event, context):
         return {
             "statusCode": 500,
             "headers": {
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": "https://mtdock.com",
                 "Access-Control-Allow-Methods": "GET,OPTIONS",
             },
             "body": f"[ERROR]: Cannot construct query.\n{str(e)}",
@@ -159,7 +159,7 @@ def handler(event, context):
                 return {
                     "body": json.dumps(entry),  # Serialize dictionary to JSON
                     "headers": {
-                        "Access-Control-Allow-Origin": "http://mtdock.com",
+                        "Access-Control-Allow-Origin": "https://mtdock.com",
                         "Access-Control-Allow-Methods": "GET,OPTIONS",
                     },
                     "statusCode": 200,
@@ -176,7 +176,7 @@ def handler(event, context):
             return {
                 "body": json.dumps(entry),  # Serialize dictionary to JSON
                 "headers": {
-                    "Access-Control-Allow-Origin": "http://mtdock.com",
+                    "Access-Control-Allow-Origin": "https://mtdock.com",
                     "Access-Control-Allow-Methods": "GET,OPTIONS",
                 },
                 "statusCode": 200,
@@ -187,7 +187,7 @@ def handler(event, context):
         return {
             "body": json.dumps(entries),  # Serialize list of dictionaries to JSON
             "headers": {
-                "Access-Control-Allow-Origin": "http://mtdock.com",
+                "Access-Control-Allow-Origin": "https://mtdock.com",
                 "Access-Control-Allow-Methods": "GET,OPTIONS",
             },
             "statusCode": 200,

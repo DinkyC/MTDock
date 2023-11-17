@@ -22,21 +22,23 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 load_dotenv()
+
+AWS_REGION = os.environ['AWS_REGION']
 class AWSClient:
     def __init__(self):
-        self.ssm = boto3.client("ssm")
+        self.ssm = boto3.client("ssm", region_name=AWS_REGION)
 
     def get_database_credentials(self):
         secret = self.get_secret()
         secret_dict = json.loads(secret)
-        return secret_dict.get('username'), secret_dict.get('port'), secret_dict.get('database'), secret_dict.get('host')
+        return secret_dict.get('username'), secret_dict.get('port'), secret_dict.get('database'), secret_dict.get('database_endpoint'), secret_dict.get('password')
 
 
     def get_secret(self):
         secret_name = "HighTimesDB"
         region_name = os.environ['AWS_REGION'] 
         session = boto3.session.Session()
-        client = session.client(service_name='secretsmanager', region_name=region_name)
+        client = session.client(service_name='secretsmanager', region_name=AWS_REGION)
         try:
             get_secret_value_response = client.get_secret_value(SecretId=secret_name)
             return get_secret_value_response['SecretString']
@@ -58,29 +60,15 @@ class AWSClient:
         return hashlib.sha256(str(data).encode("utf-8")).digest()
 
 
-    def make_token(self):
-        rds_client = boto3.client('rds')
-
-        username, port, database, endpoint = self.get_database_credentials()
-
-        database_token = rds_client.generate_db_auth_token(
-            DBHostname=endpoint,
-            Port=port,
-            DBUsername=username,
-            Region=os.environ['AWS_REGION']
-            )
-
-        return database_token 
 
 def create_app():
     aws = AWSClient()
 
-    username, port, database, host = aws.get_database_credentials()
+    username, port, database, host, password = aws.get_database_credentials()
 
-    token = aws.make_token()
 
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{username}:{token}@{host}/{database}?ssl=1&ssl_ca={SSL_CERT}" 
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{username}:{password}@{host}/{database}" 
     app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
     app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=14)
 
@@ -307,7 +295,6 @@ def get_articles():
     params_dict = aws.get_parameters_from_store(parameter)
     headers = {'Content-Type': 'application/json'}
     id = request.args.get("id")
-    print(f"id is equal to -> {id}")
     title = request.args.get("title")
 
     params = {"id": id}
