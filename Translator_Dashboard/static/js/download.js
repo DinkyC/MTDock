@@ -1,32 +1,27 @@
 const downloadWordDoc = () => {
-    let fullContent; // Define fullContent outside of the if scope
+    const baseContentBlock = document.getElementById("baseTranslation");
+    const fullContent = baseContentBlock.value;
 
-    const titleBlock = document.getElementById("title");
-    const contentBlock = document.getElementById("text");
+    const doc = new docx.Document({
+        sections: [{
+            properties: {},
+            children: fullContent.split('\n').map(line => 
+                new docx.Paragraph({
+                    children: [new docx.TextRun(line)],
+                    spacing: {
+                        after: 200, // Space after each paragraph, adjust as needed
+                    },
+                })
+            ),
+        }],
+    });
 
-    // Check if BOTH titleBlock and contentBlock exist
-    if (titleBlock && contentBlock) {
-        const title = titleBlock.innerText; // Use .innerText to get the visible text content
-        const content = contentBlock.innerText;
-
-        // Combine the title and content with a newline in between
-        fullContent = title + "\n\n" + content;
-    } else {
-        // If title and text don't exist, use the content from baseTranslation
-        const baseContentBlock = document.getElementById("baseTranslation");
-        fullContent = baseContentBlock.value; // Use .value to get the text content
-    }
-
-    // Create a Blob with content and specify the MIME type for a Word document
-    const file = new Blob([fullContent], { type: 'application/msword' });
-
-    // Create an anchor element to trigger the download
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(file);
-    link.download = "document.doc"; // Specify the desired file name
-    link.click();
-
-    // Clean up resources
-    URL.revokeObjectURL(link.href);
+    // Use Packer to generate a Blob from the document
+    docx.Packer.toBlob(doc).then(blob => {
+        console.log(blob);
+        saveAs(blob, "document.docx");
+        console.log("Document created successfully");
+    });
 };
+
 

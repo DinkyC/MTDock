@@ -103,7 +103,7 @@ def handler(event, context):
                 SELECT COUNT(*) FROM HighTimes.edited_translations
                 WHERE text_id = %s AND checksum = %s
             """
-            cursor.execute(select_statement, (data.get("id"), checksum))
+            cursor.execute(select_statement, (data.get("id"), checksum.hex()))
             result = cursor.fetchone()
 
             # If a row with the same id and checksum is found, it means the article already exists
