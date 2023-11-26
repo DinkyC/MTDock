@@ -101,7 +101,7 @@ def handler(event, context):
                 SELECT COUNT(*) FROM HighTimes.translations
                 WHERE text_id = %s AND checksum = %s
             """
-            cursor.execute(select_statement, (translated_data["id"], checksum))
+            cursor.execute(select_statement, (translated_data["id"], checksum.hex()))
             result = cursor.fetchone()
 
             # If a row with the same id and checksum is found, it means the article already exists
@@ -128,7 +128,7 @@ def handler(event, context):
                 # Execute the INSERT statement with the data
                 cursor.callproc(
                     "UpsertTranslation",
-                    (data.get("id"), json_data, data.get("providers_id"), data.get("lang_to"), data.get("lang_from"), checksum),
+                    (data.get("id"), json_data, data.get("providers_id"), data.get("lang_to"), data.get("lang_from"), checksum.hex()),
                 )
             except Exception as e:
                 return {
